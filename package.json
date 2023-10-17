@@ -1,0 +1,70 @@
+{
+  "name": "@kalisio/feathers-import-export",
+  "description": "Import/Export data with FeathersJS",
+  "version": "0.0.1",
+  "homepage": "https://github.com/kalisio/feathers-import-export",
+  "main": "lib/index.js",
+  "type": "module",
+  "keywords": [
+    "feathers",
+    "feathers-import-export"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kalisio/feathers-import-export.git"
+  },
+  "author": {
+    "name": "Kalisio contributors",
+    "url": "https://github.com/kalisio"
+  },
+  "contributors": [],
+  "bugs": {
+    "url": "https://github.com/kalisio/feathers-import-export/issues"
+  },
+  "engines": {
+    "node": ">= 16.0.0"
+  },
+  "scripts": {
+    "publish": "git push origin --tags && git push origin",
+    "release:patch": "npm version patch && npm publish --access public",
+    "release:minor": "npm version minor && npm publish --access public",
+    "release:major": "npm version major && npm publish --access public",
+    "lint": "standard lib/**/*.js test/**/*.js --fix",
+    "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ mocha --exit --timeout 30000",
+    "coverage": "c8 npm run mocha",
+    "test": "npm run lint && npm run coverage"
+  },
+  "standard": {
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "env": [
+      "mocha"
+    ],
+    "globals": [
+      "expect"
+    ]
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "debug": "^4.3.4",
+    "lodash": "^4.17.21",
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "@feathersjs/express": "^5.0.11",
+    "@feathersjs/feathers": "^5.0.11",
+    "@feathersjs/mongodb": "^5.0.11",
+    "@kalisio/feathers-s3": "^1.2.0",
+    "c8": "^8.0.1",
+    "chai": "^4.3.10",
+    "chai-lint": "^0.1.1",
+    "cross-env": "^7.0.3",
+    "mocha": "^10.2.0",
+    "mongodb": "^6.1.0",
+    "standard": "^17.1.0"
+  }
+}
