@@ -52,7 +52,8 @@
   "dependencies": {
     "debug": "^4.3.4",
     "lodash": "^4.17.21",
-    "papaparse": "^5.4.1"
+    "papaparse": "^5.4.1",
+    "stream-json": "^1.8.0"
   },
   "devDependencies": {
     "@feathersjs/express": "^5.0.11",

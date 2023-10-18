@@ -28,8 +28,7 @@ const s3Options = {
 
 const exportOptions = {
   s3Service: 's3',
-  workingDir: './test/tmp',
-  expiresIn: 30
+  workingDir: './test/tmp'
 }
 
 function runTests (query = {}) {
