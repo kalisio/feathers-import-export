@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import fs from 'fs'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
@@ -29,7 +28,51 @@ const s3Options = {
 
 const exportOptions = {
   s3Service: 's3',
-  workingDir: './test/tmp'
+  workingDir: './test/tmp',
+  expiresIn: 30
+}
+
+function runTests (query = {}) {
+  it('export movies collection in JSON using query:' + JSON.stringify(query, null, 2), async () => {
+    const response = await exportService.create({
+      method: 'export',
+      service: 'movies',
+      query
+    })
+    expect(response.SignedUrl).toExist()
+  })
+    .timeout(60000)
+  it('export movies collection in CSV using query:' + JSON.stringify(query, null, 2), async () => {
+    const response = await exportService.create({
+      method: 'export',
+      service: 'movies',
+      query,
+      format: 'csv'
+    })
+    expect(response.SignedUrl).toExist()
+  })
+    .timeout(60000)
+  it('export movies collection in zippped JSON using query:' + JSON.stringify(query, null, 2), async () => {
+    const response = await exportService.create({
+      method: 'export',
+      service: 'movies',
+      query,
+      zip: true
+    })
+    expect(response.SignedUrl).toExist()
+  })
+    .timeout(60000)
+  it('export movies collection in zipped CSV using query:' + JSON.stringify(query, null, 2), async () => {
+    const response = await exportService.create({
+      method: 'export',
+      service: 'movies',
+      query,
+      format: 'csv',
+      zip: true
+    })
+    expect(response.SignedUrl).toExist()
+  })
+    .timeout(60000)
 }
 
 describe('feathers-export-service', () => {
@@ -39,7 +82,7 @@ describe('feathers-export-service', () => {
     app.use(express.json())
     app.configure(express.rest())
   })
-  
+
   it('is ES module compatible', () => {
     expect(typeof Service).to.equal('function')
   })
@@ -61,54 +104,17 @@ describe('feathers-export-service', () => {
     expect(exportService).toExist()
     expressServer = await app.listen(3333)
   })
-  
+
   it('fill the movies collection', async () => {
-    const movies = JSON.parse(fs.readFileSync('./test/data/movies.json', { encoding: 'utf8', flag: 'r' }))
+    const movies = JSON.parse(fs.readFileSync('./test/data/movies.json'))
     let response = await mongoService.create(movies)
     expect(response.length).to.equal(36273)
-    response = await mongoService.find({ query: { $limit: 0 }})
+    response = await mongoService.find({ query: { $limit: 0 } })
     expect(response.total).to.equal(36273)
   })
 
-  it('export movies collection in json', async () => {
-    const response = await exportService.create({
-      action: 'export',
-      service: 'movies'
-    })
-    expect(response.SignedUrl).toExist()
-  })
-  .timeout(60000)
-
-  it('export movies collection in csv', async () => {
-    const response = await exportService.create({
-      action: 'export',
-      service: 'movies',
-      format: 'csv'
-    })
-    expect(response.SignedUrl).toExist()
-  })
-  .timeout(60000)
-
-  it('export movies collection in zipped json', async () => {
-    const response = await exportService.create({
-      action: 'export',
-      service: 'movies',
-      zip: true
-    })
-    expect(response.SignedUrl).toExist()
-  })
-  .timeout(60000)
-
-  it('export movies collection in zipped csv', async () => {
-    const response = await exportService.create({
-      action: 'export',
-      service: 'movies',
-      format: 'csv',
-      zip: true
-    })
-    expect(response.SignedUrl).toExist()
-  })
-  .timeout(60000)
+  runTests({})
+  runTests({ $and: [ { year: {$gte: 1970 } }, { year: { $lt: 1980 }} ] })
 
   after(async () => {
     await removeMongoService('movies')
