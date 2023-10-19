@@ -10,7 +10,8 @@ import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
 
-let app, mongoService, s3Service, importService, expressServer
+let app, objectsService, recordsService, featuresService,
+    s3Service, importService, expressServer, id
 
 const s3Options = {
   s3Client: {
@@ -34,28 +35,29 @@ const exportOptions = {
 const scenarios = [
   { 
     filePath: './test/data/objects.json' ,
-    mimeType: 'application/json'
-  },
-  {
-    filePath: './test/data/records.csv' ,
-    mimeType: 'text/csv'
+    mimeType: 'application/json',
+    service: 'objects'
   },
   { 
     filePath: './test/data/features.geojson' ,
-    mimeType: 'application/geo+json'
+    mimeType: 'application/geo+json',
+    service: 'features'
+  },
+  {
+    filePath: './test/data/records.csv' ,
+    mimeType: 'text/csv',
+    service: 'records'
   }
 ]
 
 
 function runTests (scenario) {
-  let id
   it(`upload file ${scenario.filePath}`, async () => {
     const response = await s3Service.uploadFile({ filePath: scenario.filePath, mimeType: scenario.mimeType })
     id = response.id
   })
-  it(`import file ${id}`, async () => {
-    const response = await s3Service.getObjectCommand({ id })
-    console.log(response)
+  it(`import file ${scenario.filePath}`, async () => {
+    const response = await importService.import({ id, service: scenario.service })
   })
 }
 
@@ -72,10 +74,16 @@ describe('feathers-import-service', () => {
   })
 
   it('create the services', async () => {
-    // create a dummy service
+    // create mongo services
+    app.use('objects', await createMongoService('objects'))
+    objectsService = app.service('objects')
+    expect(objectsService).toExist()
+    app.use('records', await createMongoService('records'))
+    recordsService = app.service('records')
+    expect(recordsService).toExist()
     app.use('features', await createMongoService('features'))
-    mongoService = app.service('features')
-    expect(mongoService).toExist()
+    featuresService = app.service('features')
+    expect(featuresService).toExist()
     // create the s3 service
     app.use('s3', new S3Service(s3Options), {
       methods: ['create', 'uploadFile']
@@ -89,23 +97,13 @@ describe('feathers-import-service', () => {
     expressServer = await app.listen(3333)
   })
 
-  it('fill the movies collection', async () => {
-    const parser = new Parser()
-
-    let objectCounter = 0
-    parser.on('data', data => data.name === 'startObject' && ++objectCounter)
-    parser.on('end', () => console.log(`Found ${objectCounter} objects.`))
-
-    await pipelineAsync(
-      fs.createReadStream('./test/data/features.geojson'),
-      parser,
-      new Pick({ filter: 'type' }),
-      new StreamValues()
-    )
-  })
+  runTests(scenarios[0])
+  runTests(scenarios[1])
 
   after(async () => {
-    await removeMongoService('movies')
+    await removeMongoService('objects')
+    await removeMongoService('records')
+    await removeMongoService('features')
     await expressServer.close()
   })
 })

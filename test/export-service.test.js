@@ -23,7 +23,7 @@ const s3Options = {
     signatureVersion: 'v4'
   },
   bucket: process.env.S3_BUCKET,
-  prefix: 'exports'
+  prefix: 'export'
 }
 
 const exportOptions = {
@@ -32,44 +32,44 @@ const exportOptions = {
 }
 
 function runTests (query = {}) {
-  it('export movies collection in JSON using query:' + JSON.stringify(query, null, 2), async () => {
+  it('export objects collection in JSON using query:' + JSON.stringify(query, null, 2), async () => {
     const response = await exportService.create({
       method: 'export',
-      service: 'movies',
+      service: 'objects',
       query
     })
-    expect(response.SignedUrl).toExist()
+    expect(response.id).toExist()
   })
     .timeout(60000)
-  it('export movies collection in CSV using query:' + JSON.stringify(query, null, 2), async () => {
+  it('export objects collection in CSV using query:' + JSON.stringify(query, null, 2), async () => {
     const response = await exportService.create({
       method: 'export',
-      service: 'movies',
+      service: 'objects',
       query,
       format: 'csv'
     })
-    expect(response.SignedUrl).toExist()
+    expect(response.id).toExist()
   })
     .timeout(60000)
-  it('export movies collection in zippped JSON using query:' + JSON.stringify(query, null, 2), async () => {
+  it('export objects collection in zippped JSON using query:' + JSON.stringify(query, null, 2), async () => {
     const response = await exportService.create({
       method: 'export',
-      service: 'movies',
+      service: 'objects',
       query,
       zip: true
     })
-    expect(response.SignedUrl).toExist()
+    expect(response.id).toExist()
   })
     .timeout(60000)
-  it('export movies collection in zipped CSV using query:' + JSON.stringify(query, null, 2), async () => {
+  it('export objects collection in zipped CSV using query:' + JSON.stringify(query, null, 2), async () => {
     const response = await exportService.create({
       method: 'export',
-      service: 'movies',
+      service: 'objects',
       query,
       format: 'csv',
       zip: true
     })
-    expect(response.SignedUrl).toExist()
+    expect(response.id).toExist()
   })
     .timeout(60000)
 }
@@ -88,8 +88,8 @@ describe('feathers-export-service', () => {
 
   it('create the services', async () => {
     // create a dummy service
-    app.use('movies', await createMongoService('movies'))
-    mongoService = app.service('movies')
+    app.use('objects', await createMongoService('objects'))
+    mongoService = app.service('objects')
     expect(mongoService).toExist()
     // create the s3 service
     app.use('s3', new S3Service(s3Options), {
@@ -104,9 +104,9 @@ describe('feathers-export-service', () => {
     expressServer = await app.listen(3333)
   })
 
-  it('fill the movies collection', async () => {
-    const movies = JSON.parse(fs.readFileSync('./test/data/movies.json'))
-    let response = await mongoService.create(movies)
+  it('fill the objects collection', async () => {
+    const objects = JSON.parse(fs.readFileSync('./test/data/objects.json'))
+    let response = await mongoService.create(objects)
     expect(response.length).to.equal(36273)
     response = await mongoService.find({ query: { $limit: 0 } })
     expect(response.total).to.equal(36273)
@@ -116,7 +116,7 @@ describe('feathers-export-service', () => {
   runTests({ $and: [ { year: {$gte: 1970 } }, { year: { $lt: 1980 }} ] })
 
   after(async () => {
-    await removeMongoService('movies')
+    await removeMongoService('objects')
     await expressServer.close()
   })
 })
