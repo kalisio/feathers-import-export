@@ -8,15 +8,6 @@ import { Service } from '../lib/index.js'
 import { createMongoService, removeMongoService } from './mongo-service.js'
 import makeDebug from 'debug'
 
-// TMP
-import Parser from 'stream-json/Parser.js'
-import Pick from 'stream-json/filters/Pick.js'
-import StreamValues from 'stream-json/streamers/StreamValues.js'
-import { promisify } from 'util'
-import { pipeline } from 'stream'
-
-const pipelineAsync = promisify(pipeline)
-
 feathers.setDebug(makeDebug)
 
 let app, mongoService, s3Service, importService, expressServer
@@ -32,12 +23,40 @@ const s3Options = {
     signatureVersion: 'v4'
   },
   bucket: process.env.S3_BUCKET,
-  prefix: 'exports'
+  prefix: 'import'
 }
 
 const exportOptions = {
   s3Service: 's3',
   workingDir: './test/tmp'
+}
+
+const scenarios = [
+  { 
+    filePath: './test/data/objects.json' ,
+    mimeType: 'application/json'
+  },
+  {
+    filePath: './test/data/records.csv' ,
+    mimeType: 'text/csv'
+  },
+  { 
+    filePath: './test/data/features.geojson' ,
+    mimeType: 'application/geo+json'
+  }
+]
+
+
+function runTests (scenario) {
+  let id
+  it(`upload file ${scenario.filePath}`, async () => {
+    const response = await s3Service.uploadFile({ filePath: scenario.filePath, mimeType: scenario.mimeType })
+    id = response.id
+  })
+  it(`import file ${id}`, async () => {
+    const response = await s3Service.getObjectCommand({ id })
+    console.log(response)
+  })
 }
 
 describe('feathers-import-service', () => {
