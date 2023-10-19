@@ -9,7 +9,13 @@ import { createMongoService, removeMongoService } from './mongo-service.js'
 import makeDebug from 'debug'
 
 // TMP
-import jsonParser, { pick, streamValues } from 'stream-json'
+import Parser from 'stream-json/Parser.js'
+import Pick from 'stream-json/filters/Pick.js'
+import StreamValues from 'stream-json/streamers/StreamValues.js'
+import { promisify } from 'util'
+import { pipeline } from 'stream'
+
+const pipelineAsync = promisify(pipeline)
 
 feathers.setDebug(makeDebug)
 
@@ -65,12 +71,18 @@ describe('feathers-import-service', () => {
   })
 
   it('fill the movies collection', async () => {
-    const pipeline = fs.createReadStream('./test/data/movies.json').pipe(jsonParser()).pipe(pick({filter: 'type'})).pipe(streamValues(),
-      data => {
-        console.log(data)
-        return data
-    })
+    const parser = new Parser()
 
+    let objectCounter = 0
+    parser.on('data', data => data.name === 'startObject' && ++objectCounter)
+    parser.on('end', () => console.log(`Found ${objectCounter} objects.`))
+
+    await pipelineAsync(
+      fs.createReadStream('./test/data/features.geojson'),
+      parser,
+      new Pick({ filter: 'type' }),
+      new StreamValues()
+    )
   })
 
   after(async () => {
