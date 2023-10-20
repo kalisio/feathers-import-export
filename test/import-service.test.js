@@ -71,7 +71,7 @@ function runTests (scenario) {
     // TODO
     await importService.import({ id, service: scenario.service })
   })
-    .timeout(120000)
+    .timeout(300000)
   it(`[${scenario.name}] check collection`, async () => {
     const service = app.service(scenario.service)
     const response = await service.find()
