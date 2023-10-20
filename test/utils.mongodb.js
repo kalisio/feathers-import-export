@@ -1,5 +1,6 @@
 import { MongoClient } from 'mongodb'
 import { MongoDBService } from '@feathersjs/mongodb'
+import { Writable } from 'stream'
 
 let client
 let database
@@ -20,4 +21,15 @@ export async function createMongoService (name) {
 
 export async function removeMongoService (name) {
   await database.collection(name).drop()
+}
+
+export class WriteMongoService extends Writable {
+  constructor(options) {
+    super(Object.assign(options, { objectMode: true }))
+    this.service = options.service
+  }
+  async _write(chunk, encoding, next) {
+    await this.service.create(chunk)
+    next()
+  }
 }

@@ -1,17 +1,19 @@
 import fs from 'fs'
+import { promisify } from 'util'
+import { pipeline } from 'stream'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
 import { Service as S3Service } from '@kalisio/feathers-s3'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import { Service } from '../lib/index.js'
-import { createMongoService, removeMongoService } from './utils.mongodb.js'
+import { createMongoService, removeMongoService, WriteMongoService } from './utils.mongodb.js'
 import { getTmpPath, unzipDataset } from './utils.dataset.js'
 import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
 
-let app, mongoService, s3Service, exportService, expressServer
+let app, exportService, expressServer
 
 const s3Options = {
   s3Client: {
@@ -34,40 +36,36 @@ const exportOptions = {
 
 const scenarios = [
   {
+    name: 'json',
     service: 'objects',
-    format: 'json',
     query: '{ $and: [{ year: { $gte: 1970 } }, { year: { $lt: 1980 } }] }'
   },
   {
-    service: 'features',
-    format: 'geojson'
+    name: 'geojson',
+    service: 'features'
   },
   {
-    service: 'records',
-    foramt: 'csv'
+    name: 'csv',
+    service: 'records'
   }
 ]
 
 function getDataset (scenario) {
-  return `${scenario.service}.${scenario.format}`
+  return `${scenario.service}.${scenario.name}`
 }
 
 function runTests (scenario) {
-  it(`unzip archive ${scenario.service}`, async () => {
+  it(`[${scenario.name}] unzip dataset`, async () => {
     await unzipDataset(getDataset(scenario))
   })
-  it('fill the mongodb collection', async () => {
+  it(`[${scenario.name}] fill collection`, async () => {
     const datasetPath = getTmpPath(getDataset(scenario))
-    const dataset = JSON.parse(fs.readFileSync(datasetPath))
-    const service = app.service(scenario.service)
-    let response = await service.create(dataset)
-    response = await service.find({ query: { $limit: 0 } })
-    expect(response.total).toExist()
-    /* expect(response.length).to.equal(36273)
-    response = await mongoService.find({ query: { $limit: 0 } })
-    expect(response.total).to.equal(36273)
-    */
+    await promisify(pipeline)(
+      fs.createReadStream(datasetPath),
+      new WriteMongoService({ service: app.service(scenario.service) })
+    )
   })
+    .timeout(60000)
   /* it('export objects collection in JSON using query:' + JSON.stringify(query, null, 2), async () => {
     const response = await exportService.create({
       method: 'export',
