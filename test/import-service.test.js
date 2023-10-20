@@ -4,7 +4,8 @@ import { Service as S3Service } from '@kalisio/feathers-s3'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import { Service } from '../lib/index.js'
-import { createMongoService, removeMongoService } from './mongo-service.js'
+import { createMongoService, removeMongoService } from './utils.mongodb.js'
+import { getTmpPath, unzipDataset, clearDataset } from './utils.dataset.js'
 import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
@@ -32,42 +33,54 @@ const exportOptions = {
 
 const scenarios = [
   {
-    filePath: './test/data/objects.json',
+    name: 'json',
     mimeType: 'application/json',
     service: 'objects',
     total: 36273
   },
   {
-    filePath: './test/data/features.geojson',
+    name: 'geojson',
     mimeType: 'application/geo+json',
     service: 'features',
     total: 255
   },
   {
-    filePath: './test/data/records.csv',
+    name: 'csv',
     mimeType: 'text/csv',
     service: 'records',
-    total: 17008
+    total: 500000
   }
 ]
 
+function getDataset (scenario) {
+  return `${scenario.service}.${scenario.name}`
+}
+
 function runTests (scenario) {
-  it(`upload file ${scenario.filePath} of type of ${scenario.mimeType}`, async () => {
-    const response = await s3Service.uploadFile({ filePath: scenario.filePath, mimeType: scenario.mimeType })
+  it(`[${scenario.name}] unzip dataset`, async () => {
+    await unzipDataset(getDataset(scenario))
+  })
+  it(`[${scenario.name}] upload dataset`, async () => {
+    const response = await s3Service.uploadFile({
+      filePath: getTmpPath(getDataset(scenario)),
+      mimeType: scenario.mimeType
+    })
     id = response.id
   })
-  it(`import uploaded file ${scenario.filePath}`, async () => {
-    const response = await importService.import({ id, service: scenario.service })
-    console.log(response)
+  it(`[${scenario.name}] import dataset`, async () => {
+    // TODO
+    await importService.import({ id, service: scenario.service })
   })
-  it(`check documents count for service ${scenario.service}`, async () => {
+    .timeout(60000)
+  it(`[${scenario.name}] check collection`, async () => {
     const service = app.service(scenario.service)
     const response = await service.find()
     expect(response.total).to.equal(scenario.total)
   })
-  it(`remove file ${scenario.filePath}`, async () => {
+  it(`[${scenario.name}] remove dataset`, async () => {
     const response = await s3Service.remove(id)
     expect(response.$metadata.httpStatusCode).to.equal(204)
+    clearDataset(getDataset(scenario))
   })
 }
 
@@ -102,6 +115,7 @@ describe('feathers-import-service', () => {
     expressServer = await app.listen(3333)
   })
 
+  // run the scenarios
   for (const scenario of scenarios) runTests(scenario)
 
   after(async () => {

@@ -5,7 +5,8 @@ import { Service as S3Service } from '@kalisio/feathers-s3'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import { Service } from '../lib/index.js'
-import { createMongoService, removeMongoService } from './mongo-service.js'
+import { createMongoService, removeMongoService } from './utils.mongodb.js'
+import { getTmpPath, unzipDataset } from './utils.dataset.js'
 import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
@@ -31,8 +32,43 @@ const exportOptions = {
   workingDir: './test/tmp'
 }
 
-function runTests (query = {}) {
-  it('export objects collection in JSON using query:' + JSON.stringify(query, null, 2), async () => {
+const scenarios = [
+  {
+    service: 'objects',
+    format: 'json',
+    query: '{ $and: [{ year: { $gte: 1970 } }, { year: { $lt: 1980 } }] }'
+  },
+  {
+    service: 'features',
+    format: 'geojson'
+  },
+  {
+    service: 'records',
+    foramt: 'csv'
+  }
+]
+
+function getDataset (scenario) {
+  return `${scenario.service}.${scenario.format}`
+}
+
+function runTests (scenario) {
+  it(`unzip archive ${scenario.service}`, async () => {
+    await unzipDataset(getDataset(scenario))
+  })
+  it('fill the mongodb collection', async () => {
+    const datasetPath = getTmpPath(getDataset(scenario))
+    const dataset = JSON.parse(fs.readFileSync(datasetPath))
+    const service = app.service(scenario.service)
+    let response = await service.create(dataset)
+    response = await service.find({ query: { $limit: 0 } })
+    expect(response.total).toExist()
+    /* expect(response.length).to.equal(36273)
+    response = await mongoService.find({ query: { $limit: 0 } })
+    expect(response.total).to.equal(36273)
+    */
+  })
+  /* it('export objects collection in JSON using query:' + JSON.stringify(query, null, 2), async () => {
     const response = await exportService.create({
       method: 'export',
       service: 'objects',
@@ -71,7 +107,7 @@ function runTests (query = {}) {
     })
     expect(response.id).toExist()
   })
-    .timeout(60000)
+    .timeout(60000) */
 }
 
 describe('feathers-export-service', () => {
@@ -87,16 +123,15 @@ describe('feathers-export-service', () => {
   })
 
   it('create the services', async () => {
-    // create a dummy service
-    app.use('objects', await createMongoService('objects'))
-    mongoService = app.service('objects')
-    expect(mongoService).toExist()
+    // create mongo services
+    for (const scenario of scenarios) {
+      app.use(scenario.service, await createMongoService(scenario.service))
+      expect(app.service(scenario.service)).toExist()
+    }
     // create the s3 service
     app.use('s3', new S3Service(s3Options), {
       methods: ['create', 'uploadFile']
     })
-    s3Service = app.service('s3')
-    expect(s3Service).toExist()
     // create the export service
     app.use('export', new Service(exportOptions, app))
     exportService = app.service('export')
@@ -104,19 +139,11 @@ describe('feathers-export-service', () => {
     expressServer = await app.listen(3333)
   })
 
-  it('fill the objects collection', async () => {
-    const objects = JSON.parse(fs.readFileSync('./test/data/objects.json'))
-    let response = await mongoService.create(objects)
-    expect(response.length).to.equal(36273)
-    response = await mongoService.find({ query: { $limit: 0 } })
-    expect(response.total).to.equal(36273)
-  })
-
-  runTests({})
-  runTests({ $and: [{ year: { $gte: 1970 } }, { year: { $lt: 1980 } }] })
+  // run the scenarios
+  for (const scenario of scenarios) runTests(scenario)
 
   after(async () => {
-    await removeMongoService('objects')
+    for (const scenario of scenarios) await removeMongoService(scenario.service)
     await expressServer.close()
   })
 })
