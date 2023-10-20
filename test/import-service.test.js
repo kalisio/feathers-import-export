@@ -36,28 +36,38 @@ const scenarios = [
   { 
     filePath: './test/data/objects.json' ,
     mimeType: 'application/json',
-    service: 'objects'
+    service: 'objects',
+    total: 36273
   },
   { 
     filePath: './test/data/features.geojson' ,
     mimeType: 'application/geo+json',
-    service: 'features'
+    service: 'features',
+    total: 17008
   },
   {
     filePath: './test/data/records.csv' ,
     mimeType: 'text/csv',
-    service: 'records'
+    service: 'records',
+    total: 125
   }
 ]
 
-
 function runTests (scenario) {
-  it(`upload file ${scenario.filePath}`, async () => {
+  it(`upload file ${scenario.filePath} of type of ${scenario.mimeType}`, async () => {
     const response = await s3Service.uploadFile({ filePath: scenario.filePath, mimeType: scenario.mimeType })
     id = response.id
   })
-  it(`import file ${scenario.filePath}`, async () => {
+  it(`import uploaded file ${scenario.filePath}`, async () => {
     const response = await importService.import({ id, service: scenario.service })
+  })
+  it(`check documents count for service ${scenario.service}`, async () => {
+    const service = app.service(scenario.service)
+    const response = await service.find()
+    expect(response.total).to.equal(scenario.total)
+  })
+  it(`remove file ${scenario.filePath}`, async () => {
+    const response = await s3Service.remove(id)
   })
 }
 
@@ -75,15 +85,10 @@ describe('feathers-import-service', () => {
 
   it('create the services', async () => {
     // create mongo services
-    app.use('objects', await createMongoService('objects'))
-    objectsService = app.service('objects')
-    expect(objectsService).toExist()
-    app.use('records', await createMongoService('records'))
-    recordsService = app.service('records')
-    expect(recordsService).toExist()
-    app.use('features', await createMongoService('features'))
-    featuresService = app.service('features')
-    expect(featuresService).toExist()
+    for (const scenario of scenarios) {
+      app.use(scenario.service, await createMongoService(scenario.service))
+      expect(app.service(scenario.service)).toExist()
+    }
     // create the s3 service
     app.use('s3', new S3Service(s3Options), {
       methods: ['create', 'uploadFile']
@@ -97,13 +102,10 @@ describe('feathers-import-service', () => {
     expressServer = await app.listen(3333)
   })
 
-  runTests(scenarios[0])
-  runTests(scenarios[1])
+  for (const scenario of scenarios) runTests(scenario)
 
   after(async () => {
-    await removeMongoService('objects')
-    await removeMongoService('records')
-    await removeMongoService('features')
+    for (const scenario of scenarios) await removeMongoService(scenario.service)
     await expressServer.close()
   })
 })
