@@ -106,11 +106,16 @@ function runTests (scenario) {
     keys.push(response.id)
   })
     .timeout(60000)
+  it(`[${scenario.name}] list exported files`, async () => {
+    const response = await s3Service.find()
+    xpect(response.length).to.equal(keys.length)
+  })
   it(`[${scenario.name}] clean`, async () => {
     for (const key of keys) {
       const response = await s3Service.remove(key)
       expect(response.$metadata.httpStatusCode).to.equal(204)
     }
+    keys = []
     clearDataset(getDataset(scenario))
   })
 }
