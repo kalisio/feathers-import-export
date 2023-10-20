@@ -5,7 +5,7 @@ notifications:
   email: false
   slack:
     rooms:
-      secure: BPJ5vGmMt0R7de1vkPrZENbzerla3z0bVon5wHEoEmHFbvYryh3MCt2tQGkaFs/0PXeCH8NiegKdS+oooe7HI2tzfT5/musUC1pGxS57ubu3ruGzZE1syFekCtEi17habSu4wwUBkN5ADIo5kd+Zn/tzjxKTWCB8OXA5/phmtULu33Eg49TNenLeGu59ru01p16V5JgD8cbhEuFyTCmBGu5x0C/uJOp0oTYNAbsUnrPIZ8aJ4HXPEW+BcN6lNrcbeQDsPS9cdR9pRw6BWf4d4TJLO0GfTo0QiCo0/mvawfYs8MBKuS3C0E/nNcPJJBvPNO9oI9qP7OhSe8WXd0NCdxU9+0WQeLDf7aNnzKMG1xw+gf9ekRKXUPGVwMNYdEhu6t2KnwSONocSeV6yx8F4g5ui1nWskHTV3W12h7W4wLDbPD3A1XV/EUesxQbLWs8l8BaZhkba4N9JGDkdFIth7Zk0qoIqitZ5nvLaUS2LsWjdWftIO3AMZvH4zmFE3yAhqtZmA5Ochvu0GymV/MJS7Nld/YV8Z2My7VDNtghJMfq2l9NM2G/au4zNygJi/87ttbhZFgQmZOyMA4xYXhsBfowO/8ebQik4+7VkiwCRn/1APM+/BoNeZl3/czmdm2+EVpZXuNr7rmTzgW+cQm5vq7p5bUBXKj4TpSgntp8ZHeE=
+      secure: M7YNWckJLxcqMUJ2yhP648eYzhBSbUhai3VvVyFYvUjNbUgWWuMtCJSV9RGN95cvVHYzVSnfk4vMMdQ64ddrbK8uTa7lvksp+mqqEBn73tK7E7wP2GF5MwiyDKzoExaU1Ux1MBzIbFYahudmbF860lBq2FgsnnwquzJWGly6A4Dk+YO9SYk0n0+EKsPkCO9rzrViITrXuTJ8hcnszogsRUuxSqXufgCgW29HGQVh7aF2iqV5s2L2kCeTpzQBDIj014PPoIEsu/hOgzrf/fOHsr/bkzyg8EtdqWSZ1fakFOL5tGcVD/2gEnzvNO/y/kGYUMH+DIG5ASYODeVCKMmLaBcH9BNPi0YUoEJDxd3Oev5SeIj4N8PrsgCotN/fBZD1QlTGUe5Dn35acThMoqb5x8PqZ99qCAuF4vGYmkQNcqH/FYNssk6JxRmufaak5LSnvcBFPkvvnCWYQ45JtbWA3A0AgIwCLRzr6kAe7bLTELyU2hT6u5Vq7tsSwa1mhs+xtiTpVUQFGG5pkwwSJBn+K7WLIOCvhQv8HvUoBrJJhOI/V6FxoQRoTVDHP3bkTogjkrKlrTyQ7FGlmvhAiBx6UsRoKPmj7jmsDBmjkx+l9OAZeV3cvSaVTiqCr5OlxCKwo7j3zY309PJ92PoavzHpJ/4tNrIjeP7qyHKlwCHIbnc=
     on_success: always
     on_failure: always
 env:
@@ -15,7 +15,9 @@ before-script:
   > ./cc-test-reporter
 - chmod +x ./cc-test-reporter
 - "./cc-test-reporter before-build"
+- git clone https://oauth2:$GITHUB_TOKEN@github.com/kalisio/development.git "development"
 script:
+- source development/workspaces/libs/libs.sh feathers-import-export
 - yarn test
 after_script:
 - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
