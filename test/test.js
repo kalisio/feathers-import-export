@@ -1,3 +1,4 @@
+import fs from 'fs'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
 import { Service as S3Service } from '@kalisio/feathers-s3'
@@ -83,6 +84,11 @@ function runTests (scenario) {
     const response = await service.find()
     expect(response.total).to.equal(scenario.total)
   })
+  it(`[${scenario.name}] clean dataset`, async () => {
+    const response = await s3Service.remove(id)
+    expect(response.$metadata.httpStatusCode).to.equal(204)
+    clearDataset(getDataset(scenario))
+  })
   it(`[${scenario.name}] export collection`, async () => {
     const response = await service.create({
       method: 'export',
@@ -94,7 +100,7 @@ function runTests (scenario) {
     keys.push(response.id)
   })
     .timeout(60000)
-  it(`[${scenario.name}] export collection (no compression)`, async () => {
+  it(`[${scenario.name}] export collection without gzip compression`, async () => {
     const response = await service.create({
       method: 'export',
       service: scenario.service,
@@ -110,13 +116,20 @@ function runTests (scenario) {
     const response = await s3Service.find()
     expect(response.length).to.equal(keys.length)
   })
-  it(`[${scenario.name}] clean`, async () => {
+  it(`[${scenario.name}] download exported files`, async () => {
+    for (const key of keys) {
+      const response = await s3Service.downloadFile({ id: key, filePath: getTmpPath(key) })
+      expect(response.id).toExist()
+      expect(fs.statSync(response.filePath)).toExist
+    }
+  })
+  it(`[${scenario.name}] clean exported files`, async () => {
     for (const key of keys) {
       const response = await s3Service.remove(key)
       expect(response.$metadata.httpStatusCode).to.equal(204)
+      clearDataset(key)
     }
     keys = []
-    clearDataset(getDataset(scenario))
   })
 }
 
@@ -140,7 +153,7 @@ describe('feathers-import-export', () => {
     }
     // create s3 service
     app.use('s3', new S3Service(s3Options), {
-      methods: ['create', 'uploadFile']
+      methods: ['uploadFile', 'downloadFile']
     })
     s3Service = app.service('s3')
     expect(s3Service).toExist()
