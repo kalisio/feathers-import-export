@@ -113,7 +113,7 @@ describe('feathers-export-service', () => {
   })
 
   runTests({})
-  runTests({ $and: [ { year: {$gte: 1970 } }, { year: { $lt: 1980 }} ] })
+  runTests({ $and: [{ year: { $gte: 1970 } }, { year: { $lt: 1980 } }] })
 
   after(async () => {
     await removeMongoService('objects')

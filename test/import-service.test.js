@@ -1,4 +1,3 @@
-import fs from 'fs'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
 import { Service as S3Service } from '@kalisio/feathers-s3'
@@ -10,8 +9,7 @@ import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
 
-let app, objectsService, recordsService, featuresService,
-    s3Service, importService, expressServer, id
+let app, s3Service, importService, expressServer
 
 const s3Options = {
   s3Client: {
@@ -33,20 +31,20 @@ const exportOptions = {
 }
 
 const scenarios = [
-  { 
-    filePath: './test/data/objects.json' ,
+  {
+    filePath: './test/data/objects.json',
     mimeType: 'application/json',
     service: 'objects',
     total: 36273
   },
-  { 
-    filePath: './test/data/features.geojson' ,
+  {
+    filePath: './test/data/features.geojson',
     mimeType: 'application/geo+json',
     service: 'features',
     total: 17008
   },
   {
-    filePath: './test/data/records.csv' ,
+    filePath: './test/data/records.csv',
     mimeType: 'text/csv',
     service: 'records',
     total: 125
@@ -54,12 +52,14 @@ const scenarios = [
 ]
 
 function runTests (scenario) {
+  let id
   it(`upload file ${scenario.filePath} of type of ${scenario.mimeType}`, async () => {
     const response = await s3Service.uploadFile({ filePath: scenario.filePath, mimeType: scenario.mimeType })
     id = response.id
   })
   it(`import uploaded file ${scenario.filePath}`, async () => {
-    const response = await importService.import({ id, service: scenario.service })
+    const response = await importService.import({ id, service: scenario.service })
+    expect(response.id).toExist()
   })
   it(`check documents count for service ${scenario.service}`, async () => {
     const service = app.service(scenario.service)
@@ -68,6 +68,7 @@ function runTests (scenario) {
   })
   it(`remove file ${scenario.filePath}`, async () => {
     const response = await s3Service.remove(id)
+    expect(response.$metadata.httpStatusCode).to.equal(204)
   })
 }
 
