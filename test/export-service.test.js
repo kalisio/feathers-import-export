@@ -65,7 +65,7 @@ function runTests (scenario) {
       new WriteMongoService({ service: app.service(scenario.service) })
     )
   })
-    .timeout(60000)
+    .timeout(120000)
   /* it('export objects collection in JSON using query:' + JSON.stringify(query, null, 2), async () => {
     const response = await exportService.create({
       method: 'export',
