@@ -52,7 +52,6 @@
   "dependencies": {
     "JSONStream": "^1.3.5",
     "debug": "^4.3.4",
-    "geojson-stream": "^0.1.0",
     "lodash": "^4.17.21",
     "papaparse": "^5.4.1"
   },

@@ -19,5 +19,5 @@ export async function createMongoService (name) {
 }
 
 export async function removeMongoService (name) {
-  database.collection(name).drop()
+  await database.collection(name).drop()
 }
