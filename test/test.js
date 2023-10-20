@@ -10,7 +10,7 @@ import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
 
-let app, s3Service, service, expressServer, id, keys = []
+let app; let s3Service; let service; let expressServer; let id; let keys = []
 
 const s3Options = {
   s3Client: {
@@ -68,13 +68,13 @@ function runTests (scenario) {
     expect(response.id).toExist()
     id = response.id
   })
-    .timeout(60000)  
+    .timeout(60000)
   it(`[${scenario.name}] import dataset`, async () => {
     // TODO
-    await service.create({ 
+    await service.create({
       method: 'import',
       id,
-      service: scenario.service 
+      service: scenario.service
     })
   })
     .timeout(300000)
@@ -108,7 +108,7 @@ function runTests (scenario) {
     .timeout(60000)
   it(`[${scenario.name}] list exported files`, async () => {
     const response = await s3Service.find()
-    xpect(response.length).to.equal(keys.length)
+    expect(response.length).to.equal(keys.length)
   })
   it(`[${scenario.name}] clean`, async () => {
     for (const key of keys) {
