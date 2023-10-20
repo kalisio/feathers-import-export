@@ -13,12 +13,15 @@ notifications:
 env:
 - CC_TEST_REPORTER_ID=8b94ba90d9b5d20c6c06e3c9c2c126c14d904bbab5b6b7086dd4d891da6b112a
 before-script:
+# codeclimate
 - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64
   > ./cc-test-reporter
 - chmod +x ./cc-test-reporter
 - "./cc-test-reporter before-build"
+# development secrets
 - git clone https://oauth2:$GITHUB_TOKEN@github.com/kalisio/development.git development
 - source development/workspaces/libs/libs.sh feathers-import-export
+# feathers-s3
 - git clone https://oauth2:$GITHUB_TOKEN@github.com/kalisio/feathers-s3 feathers-s3
 - cd feathers-s3 && yarn && yarn link
 - cd .. && yarn link @kalisio/feathers-s3

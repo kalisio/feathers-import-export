@@ -9,7 +9,7 @@ import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
 
-let app, s3Service, importService, expressServer
+let app, s3Service, importService, expressServer, id
 
 const s3Options = {
   s3Client: {
@@ -52,7 +52,6 @@ const scenarios = [
 ]
 
 function runTests (scenario) {
-  let id
   it(`upload file ${scenario.filePath} of type of ${scenario.mimeType}`, async () => {
     const response = await s3Service.uploadFile({ filePath: scenario.filePath, mimeType: scenario.mimeType })
     id = response.id
