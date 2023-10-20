@@ -120,7 +120,7 @@ function runTests (scenario) {
     for (const key of keys) {
       const response = await s3Service.downloadFile({ id: key, filePath: getTmpPath(key) })
       expect(response.id).toExist()
-      expect(fs.statSync(response.filePath)).toExist
+      expect(fs.statSync(response.filePath)).toExist()
     }
   })
   it(`[${scenario.name}] clean exported files`, async () => {
