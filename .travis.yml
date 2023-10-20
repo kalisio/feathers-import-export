@@ -17,9 +17,12 @@ before-script:
   > ./cc-test-reporter
 - chmod +x ./cc-test-reporter
 - "./cc-test-reporter before-build"
-- git clone https://oauth2:$GITHUB_TOKEN@github.com/kalisio/development.git "development"
-script:
+- git clone https://oauth2:$GITHUB_TOKEN@github.com/kalisio/development.git development
 - source development/workspaces/libs/libs.sh feathers-import-export
+- git clone https://oauth2:$GITHUB_TOKEN@github.com/kalisio/feathers-s3 featehrs-s3
+- cd feathers-s3 && yarn && yarn link
+- cd .. && yarn link @kalisio/feathers-s3
+script:
 - yarn test
 after_script:
 - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
