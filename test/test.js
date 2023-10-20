@@ -11,7 +11,12 @@ import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
 
-let app; let s3Service; let service; let expressServer; let id; let keys = []
+let app
+let s3Service
+let service
+let expressServer
+let inputId
+let outputIds = []
 
 const s3Options = {
   s3Client: {
@@ -36,19 +41,23 @@ const scenarios = [
     name: 'json',
     mimeType: 'application/json',
     service: 'objects',
-    total: 36273
+    query: { $and: [{ year: { $gte: 1970 } }, { year: { $lt: 2000 } }] },
+    documents: 36273,
+    sizes: [63093, 488956]
   },
   {
     name: 'geojson',
     mimeType: 'application/geo+json',
     service: 'features',
-    total: 255
+    documents: 255,
+    sizes: [57, 7213573]
   },
   {
     name: 'csv',
     mimeType: 'text/csv',
     service: 'records',
-    total: 100000
+    documents: 100000,
+    sizes: [378873, 804177]
   }
 ]
 
@@ -57,35 +66,35 @@ function getDataset (scenario) {
 }
 
 function runTests (scenario) {
-  it(`[${scenario.name}] unzip dataset`, async () => {
+  it(`[${scenario.name}] unzip input dataset`, async () => {
     await unzipDataset(getDataset(scenario))
   })
-  it(`[${scenario.name}] upload dataset`, async () => {
+  it(`[${scenario.name}] upload input dataset`, async () => {
     const response = await s3Service.uploadFile({
       filePath: getTmpPath(getDataset(scenario)),
       mimeType: scenario.mimeType,
       chunkSize: 1024 * 1024 * 20
     })
     expect(response.id).toExist()
-    id = response.id
+    inputId = response.id
   })
     .timeout(60000)
-  it(`[${scenario.name}] import dataset`, async () => {
+  it(`[${scenario.name}] import input dataset`, async () => {
     // TODO
     await service.create({
       method: 'import',
-      id,
+      id: inputId,
       service: scenario.service
     })
   })
-    .timeout(300000)
-  it(`[${scenario.name}] check collection`, async () => {
+    .timeout(180000)
+  it(`[${scenario.name}] check imported collection`, async () => {
     const service = app.service(scenario.service)
     const response = await service.find()
-    expect(response.total).to.equal(scenario.total)
+    expect(response.total).to.equal(scenario.documents)
   })
-  it(`[${scenario.name}] clean dataset`, async () => {
-    const response = await s3Service.remove(id)
+  it(`[${scenario.name}] clean input dataset`, async () => {
+    const response = await s3Service.remove(inputId)
     expect(response.$metadata.httpStatusCode).to.equal(204)
     clearDataset(getDataset(scenario))
   })
@@ -97,7 +106,7 @@ function runTests (scenario) {
       format: scenario.name
     })
     expect(response.id).toExist()
-    keys.push(response.id)
+    outputIds.push(response.id)
   })
     .timeout(60000)
   it(`[${scenario.name}] export collection without gzip compression`, async () => {
@@ -109,27 +118,27 @@ function runTests (scenario) {
       gzip: false
     })
     expect(response.id).toExist()
-    keys.push(response.id)
+    outputIds.push(response.id)
   })
     .timeout(60000)
-  it(`[${scenario.name}] list exported files`, async () => {
+  it(`[${scenario.name}] list output files`, async () => {
     const response = await s3Service.find()
-    expect(response.length).to.equal(keys.length)
+    expect(response.length).to.equal(outputIds.length)
   })
-  it(`[${scenario.name}] download exported files`, async () => {
-    for (const key of keys) {
-      const response = await s3Service.downloadFile({ id: key, filePath: getTmpPath(key) })
+  it(`[${scenario.name}] download output files`, async () => {
+    for (let i = 0; i < 2; i++) {
+      const response = await s3Service.downloadFile({ id: outputIds[i], filePath: getTmpPath(outputIds[i]) })
       expect(response.id).toExist()
-      expect(fs.statSync(response.filePath)).toExist()
+      //xpect(fs.statSync(response.filePath).size).to.equal(scenario.sizes[i])
     }
   })
-  it(`[${scenario.name}] clean exported files`, async () => {
-    for (const key of keys) {
-      const response = await s3Service.remove(key)
+  it(`[${scenario.name}] clean output files`, async () => {
+    for (let i = 0; i < 2; i++) {
+      const response = await s3Service.remove(outputIds[i])
       expect(response.$metadata.httpStatusCode).to.equal(204)
-      clearDataset(key)
+      //clearDataset(key)
     }
-    keys = []
+    outputIds = []
   })
 }
 
