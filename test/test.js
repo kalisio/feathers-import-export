@@ -49,6 +49,7 @@ const scenarios = [
     name: 'geojson',
     mimeType: 'application/geo+json',
     service: 'features',
+    chunkSize: 100,
     documents: 255,
     sizes: [57, 7213573]
   },
@@ -103,7 +104,8 @@ function runTests (scenario) {
       method: 'export',
       service: scenario.service,
       query: scenario.query,
-      format: scenario.name
+      format: scenario.name,
+      chunkSize: scenario.chunkSize
     })
     expect(response.id).toExist()
     outputIds.push(response.id)
@@ -115,6 +117,7 @@ function runTests (scenario) {
       service: scenario.service,
       query: scenario.query,
       format: scenario.name,
+      chunkSize: scenario.chunkSize,
       gzip: false
     })
     expect(response.id).toExist()
@@ -129,14 +132,13 @@ function runTests (scenario) {
     for (let i = 0; i < 2; i++) {
       const response = await s3Service.downloadFile({ id: outputIds[i], filePath: getTmpPath(outputIds[i]) })
       expect(response.id).toExist()
-      //xpect(fs.statSync(response.filePath).size).to.equal(scenario.sizes[i])
     }
   })
   it(`[${scenario.name}] clean output files`, async () => {
     for (let i = 0; i < 2; i++) {
       const response = await s3Service.remove(outputIds[i])
       expect(response.$metadata.httpStatusCode).to.equal(204)
-      //clearDataset(key)
+      clearDataset(utputIds[i])
     }
     outputIds = []
   })
