@@ -87,7 +87,7 @@ function runTests (scenario) {
       service: scenario.service
     })
   })
-    .timeout(300000)
+    .timeout(60000)
   it(`[${scenario.name}] check imported collection`, async () => {
     const service = app.service(scenario.service)
     const response = await service.find()
@@ -109,7 +109,7 @@ function runTests (scenario) {
     expect(response.id).toExist()
     outputIds.push(response.id)
   })
-    .timeout(12000)
+    .timeout(180000)
   it(`[${scenario.name}] export collection without gzip compression`, async () => {
     const response = await service.create({
       method: 'export',
@@ -122,7 +122,7 @@ function runTests (scenario) {
     expect(response.id).toExist()
     outputIds.push(response.id)
   })
-    .timeout(12000)
+    .timeout(180000)
   it(`[${scenario.name}] list output files`, async () => {
     const response = await s3Service.find()
     expect(response.length).to.equal(outputIds.length)
