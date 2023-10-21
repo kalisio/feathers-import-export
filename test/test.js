@@ -109,7 +109,7 @@ function runTests (scenario) {
     expect(response.id).toExist()
     outputIds.push(response.id)
   })
-    .timeout(60000)
+    .timeout(12000)
   it(`[${scenario.name}] export collection without gzip compression`, async () => {
     const response = await service.create({
       method: 'export',
@@ -122,7 +122,7 @@ function runTests (scenario) {
     expect(response.id).toExist()
     outputIds.push(response.id)
   })
-    .timeout(60000)
+    .timeout(12000)
   it(`[${scenario.name}] list output files`, async () => {
     const response = await s3Service.find()
     expect(response.length).to.equal(outputIds.length)
