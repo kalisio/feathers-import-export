@@ -11,7 +11,7 @@ export async function createMongoService (name, paginate = { default: 10, max: 5
   return new MongoDBService({
     Model: database.collection(name),
     multi: true,
-    paginate,
+    paginate
   })
 }
 

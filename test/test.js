@@ -1,4 +1,3 @@
-import fs from 'fs'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
 import { Service as S3Service } from '@kalisio/feathers-s3'
@@ -138,7 +137,7 @@ function runTests (scenario) {
     for (let i = 0; i < 2; i++) {
       const response = await s3Service.remove(outputIds[i])
       expect(response.$metadata.httpStatusCode).to.equal(204)
-      clearDataset(utputIds[i])
+      clearDataset(outputIds[i])
     }
     outputIds = []
   })
