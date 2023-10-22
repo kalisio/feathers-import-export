@@ -136,6 +136,7 @@ function runTests (scenario) {
       expect(response.id).toExist()
       const size = fs.statSync(tmpFilePath).size
       const diff = Math.abs(size - scenario.sizes[i])
+      console.log(size, diff)
       expect(diff < 1024).to.equal(true)
     }
   })
