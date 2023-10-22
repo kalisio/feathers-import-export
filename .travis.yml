@@ -26,7 +26,7 @@ before-script:
 - cd feathers-s3 && yarn && yarn link
 - cd .. && yarn link @kalisio/feathers-s3
 script:
-- export DEBUG="feathers-import-export:import;feathers-import-export:export"
+- export DEBUG="feathers-import-export:*"
 - yarn test
 after_script:
 - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
