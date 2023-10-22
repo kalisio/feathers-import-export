@@ -1,4 +1,4 @@
-import fs from'fs'
+import fs from 'fs'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
 import { Service as S3Service } from '@kalisio/feathers-s3'
@@ -136,14 +136,14 @@ function runTests (scenario) {
       expect(response.id).toExist()
       const size = fs.statSync(tmpFilePath).size
       const diff = Math.abs(size - scenario.sizes[i])
-      expect(diff < 1024).to.be.true
+      expect(diff < 1024).to.be.true()
     }
   })
   it(`[${scenario.name}] clean output files`, async () => {
     for (let i = 0; i < 2; i++) {
       const response = await s3Service.remove(outputIds[i])
       expect(response.$metadata.httpStatusCode).to.equal(204)
-      //clearDataset(outputIds[i])
+      clearDataset(outputIds[i])
     }
     outputIds = []
   })
