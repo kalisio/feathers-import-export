@@ -1,3 +1,4 @@
+import fs from'fs'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
 import { Service as S3Service } from '@kalisio/feathers-s3'
@@ -30,7 +31,7 @@ const s3Options = {
   bucket: process.env.S3_BUCKET
 }
 
-const exportOptions = {
+const options = {
   s3Service: 's3',
   workingDir: './test/tmp'
 }
@@ -42,7 +43,7 @@ const scenarios = [
     service: 'objects',
     query: { $and: [{ year: { $gte: 1970 } }, { year: { $lt: 2000 } }] },
     documents: 36273,
-    sizes: [63093, 488956]
+    sizes: [1357150, 4653391]
   },
   {
     name: 'geojson',
@@ -50,14 +51,15 @@ const scenarios = [
     service: 'features',
     chunkSize: 100,
     documents: 255,
-    sizes: [57, 7213573]
+    sizes: [7109229, 21374235]
   },
   {
     name: 'csv',
     mimeType: 'text/csv',
     service: 'records',
+    query: { $select: ['Name', 'Industry'] },
     documents: 100000,
-    sizes: [378873, 804177]
+    sizes: [1656754, 6329205]
   }
 ]
 
@@ -129,15 +131,19 @@ function runTests (scenario) {
   })
   it(`[${scenario.name}] download output files`, async () => {
     for (let i = 0; i < 2; i++) {
-      const response = await s3Service.downloadFile({ id: outputIds[i], filePath: getTmpPath(outputIds[i]) })
+      const tmpFilePath = getTmpPath(outputIds[i])
+      const response = await s3Service.downloadFile({ id: outputIds[i], filePath: tmpFilePath })
       expect(response.id).toExist()
+      const size = fs.statSync(tmpFilePath).size
+      const diff = Math.abs(size - scenario.sizes[i])
+      expect(diff < 1024).to.be.true
     }
   })
   it(`[${scenario.name}] clean output files`, async () => {
     for (let i = 0; i < 2; i++) {
       const response = await s3Service.remove(outputIds[i])
       expect(response.$metadata.httpStatusCode).to.equal(204)
-      clearDataset(outputIds[i])
+      //clearDataset(outputIds[i])
     }
     outputIds = []
   })
@@ -168,8 +174,8 @@ describe('feathers-import-export', () => {
     s3Service = app.service('s3')
     expect(s3Service).toExist()
     // create import-export service
-    app.use('import', new Service(exportOptions, app))
-    service = app.service('import')
+    app.use('import-export', new Service(Object.assign(options, { app })))
+    service = app.service('import-export')
     expect(service).toExist()
     expressServer = await app.listen(3333)
   })
