@@ -136,7 +136,7 @@ function runTests (scenario) {
       expect(response.id).toExist()
       const size = fs.statSync(tmpFilePath).size
       const diff = Math.abs(size - scenario.sizes[i])
-      expect(diff < 1024).to.be.true()
+      expect(diff < 1024).to.equal(true)
     }
   })
   it(`[${scenario.name}] clean output files`, async () => {
