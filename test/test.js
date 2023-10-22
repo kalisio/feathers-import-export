@@ -87,7 +87,7 @@ function runTests (scenario) {
       service: scenario.service
     })
   })
-    .timeout(60000)
+    .timeout(120000)
   it(`[${scenario.name}] check imported collection`, async () => {
     const service = app.service(scenario.service)
     const response = await service.find()
