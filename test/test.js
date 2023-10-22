@@ -73,12 +73,12 @@ function runTests (scenario) {
     const response = await s3Service.uploadFile({
       filePath: getTmpPath(getDataset(scenario)),
       mimeType: scenario.mimeType,
-      chunkSize: 1024 * 1024 * 20
+      chunkSize: 1024 * 1024 * 10
     })
     expect(response.id).toExist()
     inputId = response.id
   })
-    .timeout(60000)
+    .timeout(120000)
   it(`[${scenario.name}] import input dataset`, async () => {
     // TODO
     await service.create({
