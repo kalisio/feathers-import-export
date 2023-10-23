@@ -62,7 +62,7 @@ The payload `data` must contain the following properties:
 | Argument | Description | Required |
 |---|---|
 | `id` | the object key. Note that the final computed **Key** takes into account the `prefix` option of the service. | yes |
-| `service` | the service into which to import the data. | yes |
+| `servicePath` | the path to the service into which to import the data. | yes |
 
 ### export (data, params)
 
@@ -74,11 +74,11 @@ The payload `data` must contain the following properties:
 
 | Argument | Description | Required 
 |---|---|---|
-| `service` | the service to be queried.| yes |
+| `servicePath` | the path to the service to be queried.| yes |
 | `query` | the query to apply. Default value is `{}` | no |
 | `format` | the output format. Defaut value is `json` | no |
 | `zip`| whether to zip the output or not. Default value is `true` | no |
-| `chunkSize` | the number of objects to be processed by chunk. Defaut value is `1000` | no |
+| `chunkSize` | the number of objects to be processed by chunk. Defaut value is `500` | no |
 | `expiresIn` | the expiration delay of the returned signed url. Default value is `300` | no |
 
 It returns the `key` to the file.
