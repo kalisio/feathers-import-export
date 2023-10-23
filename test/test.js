@@ -6,7 +6,7 @@ import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import { Service } from '../lib/index.js'
 import { createMongoService, removeMongoService } from './utils.mongodb.js'
-import { getTmpPath, unzipDataset, clearDataset } from './utils.dataset.js'
+import { getTmpPath, unzipDataset, clearDataset, unzipFile } from './utils.dataset.js'
 import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
@@ -32,7 +32,7 @@ const s3Options = {
 }
 
 const options = {
-  s3Service: 's3',
+  s3ServicePath: 'path-to-s3',
   workingDir: './test/tmp'
 }
 
@@ -43,7 +43,7 @@ const scenarios = [
     service: 'objects',
     query: { $and: [{ year: { $gte: 1970 } }, { year: { $lt: 2000 } }] },
     documents: 36273,
-    sizes: [1357150, 4653391]
+    size: 4653391
   },
   {
     name: 'geojson',
@@ -51,7 +51,7 @@ const scenarios = [
     service: 'features',
     chunkSize: 100,
     documents: 255,
-    sizes: [7109229, 21374235]
+    size: 21374235
   },
   {
     name: 'csv',
@@ -59,7 +59,7 @@ const scenarios = [
     service: 'records',
     query: { $select: ['Name', 'Industry'] },
     documents: 100000,
-    sizes: [1662444, 6329205]
+    size: 6329205
   }
 ]
 
@@ -134,12 +134,14 @@ function runTests (scenario) {
       const tmpFilePath = getTmpPath(outputIds[i])
       const response = await s3Service.downloadFile({ id: outputIds[i], filePath: tmpFilePath })
       expect(response.id).toExist()
-      const size = fs.statSync(tmpFilePath).size
-      const diff = Math.abs(size - scenario.sizes[i])
-      // TODO
-      console.log(diff)
-      //expect(diff < 4096).to.equal(true)
     }
+    // check the size of the uncompressed file 
+    let size = fs.statSync(getTmpPath(outputIds[1])).size
+    expect(size).to.equal(scenario.size)
+    // unzip the compressed file (replace the uncompressed file) to check the size
+    await unzipFile(getTmpPath(outputIds[0]), getTmpPath(outputIds[1]))
+    size = fs.statSync(getTmpPath(outputIds[1])).size
+    expect(size).to.equal(scenario.size)
   })
   it(`[${scenario.name}] clean output files`, async () => {
     for (let i = 0; i < 2; i++) {
@@ -170,10 +172,10 @@ describe('feathers-import-export', () => {
       expect(app.service(scenario.service)).toExist()
     }
     // create s3 service
-    app.use('s3', new S3Service(s3Options), {
+    app.use('path-to-s3', new S3Service(s3Options), {
       methods: ['uploadFile', 'downloadFile']
     })
-    s3Service = app.service('s3')
+    s3Service = app.service('path-to-s3')
     expect(s3Service).toExist()
     // create import-export service
     app.use('import-export', new Service(Object.assign(options, { app })))
