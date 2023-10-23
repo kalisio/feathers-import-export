@@ -38,7 +38,7 @@ Create an instance of the service with the given options:
 
 | Parameter | Description | Required |
 |---|---|---|
-|`s3Service` | the s3Service to be retrieved from the `app`. | yes |
+|`s3ServicePath` | the path to the s3Service to be retrieved from the `app`. | yes |
 | `workingDir` | the working directory to process temporary files. Default value is `/tmp` | no |
 
 ### create (data, params)
@@ -60,7 +60,7 @@ Imports the content of a file that is stored on a **S3** compatible storage.
 The payload `data` must contain the following properties:
 
 | Argument | Description | Required |
-|---|---|
+|---|---|---|
 | `id` | the object key. Note that the final computed **Key** takes into account the `prefix` option of the service. | yes |
 | `servicePath` | the path to the service into which to import the data. | yes |
 
