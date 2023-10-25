@@ -76,10 +76,10 @@ The payload `data` must contain the following properties:
 |---|---|---|
 | `servicePath` | the path to the service to be queried.| yes |
 | `query` | the query to apply. Default value is `{}` | no |
+| `chunkSize` | the number of objects to be processed by chunk. Defaut value is `500` | no |
 | `transform`| the [transformation](./#transformation) to apply before expoting the data. Defaut is `undefined` | no |
 | `format` | the output format. Defaut value is `json` | no |
 | `zip`| whether to zip the output or not. Default value is `true` | no |
-| `chunkSize` | the number of objects to be processed by chunk. Defaut value is `500` | no |
 | `signedUrl` | whether to return a signed url. Default value is `true` | no |
 | `expiresIn` | the expiration delay of the returned signed url. Default value is `300` | no |
 
@@ -131,6 +131,7 @@ transform: {
   merge: { newProperty: 'will be added to the final objects' }
 }
 ```
+
 > TIP
 >
 > The transformations are applied in the order of the documentation, e.g. filtering occurs before mapping.
