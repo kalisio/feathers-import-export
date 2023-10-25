@@ -63,12 +63,12 @@ The payload `data` must contain the following properties:
 |---|---|---|
 | `id` | the object key. Note that the final computed **Key** takes into account the `prefix` option of the service. | yes |
 | `servicePath` | the path to the service into which to import the data. | yes |
+| `transform`| the [transformation](./#transformation) to apply before importing the data. Defaut is `undefined` | no |
 
 ### export (data, params)
 
-Exports the result of a query into a **JSON**, **CSV** or **GeoJson** file that it stored on an **S3** compatbile storage.
-
-The file can be compressed using [GZip](https://www.gzip.org/).
+Exports the result of a query into a **JSON**, **CSV** or **GeoJson** file that it stored on an **S3** compatbile storage. The file can be compressed using [GZip](https://www.gzip.org/).
+By default It returns a **Presigned URL** to the file.
 
 The payload `data` must contain the following properties:
 
@@ -76,12 +76,64 @@ The payload `data` must contain the following properties:
 |---|---|---|
 | `servicePath` | the path to the service to be queried.| yes |
 | `query` | the query to apply. Default value is `{}` | no |
+| `transform`| the [transformation](./#transformation) to apply before expoting the data. Defaut is `undefined` | no |
 | `format` | the output format. Defaut value is `json` | no |
 | `zip`| whether to zip the output or not. Default value is `true` | no |
 | `chunkSize` | the number of objects to be processed by chunk. Defaut value is `500` | no |
+| `signedUrl` | whether to return a signed url. Default value is `true` | no |
 | `expiresIn` | the expiration delay of the returned signed url. Default value is `300` | no |
 
-It returns the `key` to the file.
+### Transformation
+
+The **transform** object allow to apply a transformation before exporting or importing the data. It can be defined using the following specifications:
+
+* `toArray`: boolean indicating if the JSON object will be transformed into an array using Lodash (opens new window), defaults to false
+* `toObjects`: if your input JSON objects are flat arrays it will be transformed into objects according to the given indexed list of property names to be used as keys, not defined by default
+* `filter`: a filter to be applied on the JSON object using any option supported by [sift](https://github.com/crcn/sift.js)
+* `mapping`: a map between input key path and output key path supporting dot notation, the values of the map can also be a structure like this:
+  * `path`: output key path
+  * `value`: a map between input values and output values
+  * `delete`: boolean indicating if the input key path should be deleted or not after mapping
+* `unitMapping`: a map between input key path supporting dot notation and from/to units to convert using math.js (opens new window)for numbers or moment.js (opens new window)for dates, a value of the map is a structure like this:
+  * `from`: the unit or date format to convert from, e.g. feet or YYYY-MM-DD HH:mm:ss.SSS
+  * `to`: the unit or date format to convert to, e.g. m or MM-DD-YYYY HH:mm:ss.SSS, if given for a date the date object will be converted back to string
+  * `asDate`: mandatory to indicate if the value is a date, could be utc or local to interpret it as UTC or Local Time
+asString: mandatory to convert numbers to strings, indicates the radix (opens new window)to be used if any
+  * `asNumber`: mandatory to convert strings to numbers
+  * `asCase`: target case to be used as the name of a Lodash (opens new window)(e.g. lowerCase) or JS string (opens new window)(e.g. toUpperCase) case conversion function (e.g. lowerCase)
+  * `empty`: value to be set if the input value is empty
+* `pick`: an array of properties to be picked using Lodash(opens new window)
+* `omit`: an array of properties to be omitted using Lodash(opens new window)
+merge: an object to be merged with each JSON objects using Lodash(opens new window)
+* `asObject`: this boolean indicates if the output should be transformed into an object if the array contains a single object, defaults to false
+* `asArray`: this boolean indicates if the output should be transformed into an array containing the object, defaults to false.
+
+```js
+transform: {
+  toArray: true, // The following input object { 1: { property: 'a' }, 2: { property: 'b' } } will be transformed into [{ property: 'a' }, { property: 'b' }]
+  toObjects: ['1', '2'], // The following input object ['a', 'b'] will be transformed into { 1: 'a', 2: 'b' }
+  mapping: {
+    sourceProperty: 'targetProperty',
+    sourceProperty: {
+      path: 'targetProperty',
+      values: {
+        'a': 'c' // Will map { xxx: 'a' } to { yyy: 'c' }
+      }
+    },
+    'source.property': 'target.property',
+    sourceProperty: 'targetArrayProperty[0]'
+  },
+  unitMapping: {
+    property: { from: 'feet', to: 'm' } // This one will be converted from feet to meters
+  },
+  pick: ['onlyThisPropertyWillBeKept'],
+  omit: ['onlyThisPropertyWillBeRemoved'],
+  merge: { newProperty: 'will be added to the final objects' }
+}
+```
+> TIP
+>
+> The transformations are applied in the order of the documentation, e.g. filtering occurs before mapping.
 
 ## License
 
