@@ -34,7 +34,4 @@ node_modules
 .dtmp
 
 # test tmp files
-test/tmp/*.json
-test/tmp/*.geojson
-test/tmp/*.csv
-test/tmp/*.gz
+test/tmp
