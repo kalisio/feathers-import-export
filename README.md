@@ -83,6 +83,10 @@ The payload `data` must contain the following properties:
 | `signedUrl` | whether to return a signed url. Default value is `true` | no |
 | `expiresIn` | the expiration delay of the returned signed url. Default value is `300` | no |
 
+> WARNING
+>
+> The `chunkSize` must be less than the `max` property of the `paginate` options assigned to the service.
+
 ### Transformation
 
 The **transform** object allow to apply a transformation before exporting or importing the data. It can be defined using the following specifications:

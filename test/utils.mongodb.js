@@ -1,5 +1,7 @@
-import { MongoClient } from 'mongodb'
+import mongodb from 'mongodb'
 import { MongoDBService } from '@feathersjs/mongodb'
+
+const { MongoClient } = mongodb
 
 let client
 let database

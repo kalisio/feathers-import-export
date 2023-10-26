@@ -68,7 +68,7 @@
     "chai-lint": "^0.1.1",
     "cross-env": "^7.0.3",
     "mocha": "^10.2.0",
-    "mongodb": "^6.1.0",
+    "mongodb": "3.6.2",
     "standard": "^17.1.0"
   }
 }
