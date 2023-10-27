@@ -10,7 +10,15 @@
 
 ## Principle
 
-_TODO_
+The following sections illustrate the different process implemented by `feathers-import-export`:
+
+### Import
+
+![import principle](./docs/feathers-import-export-import.png)
+
+### Export
+
+![Upload principle](./docs/feathers-import-export-export.png)
 
 ## Usage
 
