@@ -84,6 +84,7 @@ The payload `data` must contain the following properties:
 |---|---|---|
 | `servicePath` | the path to the service to be queried.| yes |
 | `query` | the query to apply. Default value is `{}` | no |
+| `chunkPath`| the path to the data when processing the query response. Default value is `data` | no |
 | `chunkSize` | the number of objects to be processed by chunk. Defaut value is `500` | no |
 | `transform`| the [transformation](./#transformation) to apply before expoting the data. Defaut is `undefined` | no |
 | `format` | the output format. Defaut value is `json` | no |
