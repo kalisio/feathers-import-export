@@ -43,18 +43,14 @@ const scenarios = [
     service: 'objects',
     import: {
       transform: {
-        'application/json': {
-          omit: [ 'thumbnail', 'thumbnail_width', 'thumbnail_height', 'href' ]
-        }
+        omit: [ 'thumbnail', 'thumbnail_width', 'thumbnail_height', 'href' ]
       },
       documents: 36273  
     },
     export: {
       query: { $and: [{ year: { $gte: 1970 } }, { year: { $lt: 2000 } }] },
       transform:{
-        json: {
-          omit: [ '_id' ]
-        }
+        omit: [ '_id' ]
       },
       size: 3385369
     }
@@ -68,9 +64,7 @@ const scenarios = [
     },
     export: {
       transform:{
-        geojson: {
-          omit: [ '_id' ]
-        }
+        omit: [ '_id' ]
       },
       chunkSize: 100,
       size: 21365820
@@ -82,21 +76,17 @@ const scenarios = [
     service: 'records',
     import: {
       transform: {
-        'text/csv': {
-          omit: [ 'Index', 'Organization Id' ],
-          unitMapping: {
-            Founded: { asNumber: true },
-            'Number of employees': { asNumber: true }
-          }
+        omit: [ 'Index', 'Organization Id' ],
+        unitMapping: {
+          Founded: { asNumber: true },
+          'Number of employees': { asNumber: true }
         }
       },
       documents: 100000,
     }, 
     export: {
       transform:{
-        csv: {
-          omit: [ '_id' ],
-        }
+        omit: [ '_id' ]
       },
       query: { $select: ['Name', 'Industry', 'Founded'] },
       size: 4329209
