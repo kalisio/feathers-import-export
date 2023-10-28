@@ -39,32 +39,38 @@ const options = {
 const scenarios = [
   {
     name: 'json',
-    mimeType: 'application/json',
+    contentType: 'application/json',
     service: 'objects',
     import: {
       transform: {
-        omit: [ 'thumbnail', 'thumbnail_width', 'thumbnail_height', 'href' ]
+        'application/json': {
+          omit: [ 'thumbnail', 'thumbnail_width', 'thumbnail_height', 'href' ]
+        }
       },
       documents: 36273  
     },
     export: {
       query: { $and: [{ year: { $gte: 1970 } }, { year: { $lt: 2000 } }] },
       transform:{
-        omit: [ '_id' ]
+        json: {
+          omit: [ '_id' ]
+        }
       },
       size: 3385369
     }
   },
   {
     name: 'geojson',
-    mimeType: 'application/geo+json',
+    contentType: 'application/geo+json',
     service: 'features',
     import: {
       documents: 255
     },
     export: {
       transform:{
-        omit: [ '_id' ]
+        geojson: {
+          omit: [ '_id' ]
+        }
       },
       chunkSize: 100,
       size: 21365820
@@ -72,21 +78,25 @@ const scenarios = [
   },
   {
     name: 'csv',
-    mimeType: 'text/csv',
+    contentType: 'text/csv',
     service: 'records',
     import: {
       transform: {
-        omit: [ 'Index', 'Organization Id' ],
-        unitMapping: {
-          Founded: { asNumber: true },
-          'Number of employees': { asNumber: true }
+        'text/csv': {
+          omit: [ 'Index', 'Organization Id' ],
+          unitMapping: {
+            Founded: { asNumber: true },
+            'Number of employees': { asNumber: true }
+          }
         }
       },
       documents: 100000,
     }, 
     export: {
       transform:{
-        omit: [ '_id' ],
+        csv: {
+          omit: [ '_id' ],
+        }
       },
       query: { $select: ['Name', 'Industry', 'Founded'] },
       size: 4329209
@@ -105,7 +115,7 @@ function runTests (scenario) {
   it(`[${scenario.name}] upload input dataset`, async () => {
     const response = await s3Service.uploadFile({
       filePath: getTmpPath(getDataset(scenario)),
-      mimeType: scenario.mimeType,
+      contentType: scenario.contentType,
       chunkSize: 1024 * 1024 * 10
     })
     expect(response.id).toExist()

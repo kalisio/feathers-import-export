@@ -8,6 +8,14 @@
 
 > `feathers-import-export` provides convenient methods to import/export to/from FeathersJS services.
 
+
+`feathers-import-export` has been specially designed to process large volumes of data and to overcome data transfer problems during import and export, it relies on the capabilities of the S3 API. Thus the use is based on the use of a store which offers an **S3 compatible API**.
+
+> NOTE
+>
+> To deals with the objects in the stores, `feathers-import-export` relies on the [feathers-s3](https://github.com/kalisio/feathers-s3) library.
+
+
 ## Principle
 
 The following sections illustrate the different process implemented by `feathers-import-export`:
