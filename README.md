@@ -57,6 +57,16 @@ Create an instance of the service with the given options:
 |`s3ServicePath` | the path to the s3Service to be retrieved from the `app`. | yes |
 | `workingDir` | the working directory to process temporary files. Default value is `/tmp` | no |
 
+
+### registerTransform (key, transform)
+
+Register a transformation function for the given key.
+
+| Parameter | Description | Required |
+|---|---|---|
+|`key` | the key assigend to the transformation function. | yes |
+| `transform` | the transformation function. | yes |
+
 ### create (data, params)
 
 Shortcut method that calls [import](#import) or [export](#export) according the value of the `method` property.
@@ -104,9 +114,15 @@ The payload `data` must contain the following properties:
 >
 > The `chunkSize` must be less than the `max` property of the `paginate` options assigned to the service.
 
-### Transformation
+## Transformation
 
-The **transform** object allow to apply a transformation before exporting or importing the data. It can be defined using the following specifications:
+As illustrated in the previous sections, `feathers-import-export` allows you to apply a **transformation** before importing or exporting the data.
+
+The transformation can be carried out via a **transform** object or via un function.
+
+### Transform object
+
+The **transform** object can be declared with the following specifications:
 
 * `toArray`: boolean indicating if the JSON object will be transformed into an array using Lodash (opens new window), defaults to false
 * `toObjects`: if your input JSON objects are flat arrays it will be transformed into objects according to the given indexed list of property names to be used as keys, not defined by default
@@ -156,6 +172,28 @@ transform: {
 > TIP
 >
 > The transformations are applied in the order of the documentation, e.g. filtering occurs before mapping.
+
+### Transform function
+
+The transformation function must be [registered](#registertransform-key-transform) in the service.
+
+The function must have the following signature: `function myTrasnform (chunk)` where `chunk` represents an array of JSON objects.
+
+```js
+function myTrasnform (chunk) {
+  chunk.forEach(object => {
+    // mutate object
+  })
+  return chunk
+}
+```
+To specify the transformation function within the **import** or **export** payload, you must declare assign to the `transform` property the **key** used to register the function
+
+Assuming you have register the function `myTransform` with the key `my-transform`, then you can declare the transformation function as below:
+
+```js
+transform: 'my-transform'
+```
 
 ## License
 
