@@ -32,7 +32,7 @@ const options = {
       signatureVersion: 'v4'
     },
     bucket: process.env.S3_BUCKET,
-    prefix: 'tmp'
+    prefix: Date.now().toString()
   }
 }
 
@@ -236,13 +236,6 @@ describe('feathers-import-export', () => {
     service = app.service('import-export')
     expect(service).toExist()
     expressServer = await app.listen(3333)
-  })
-
-  it('clean import/export bucket dir', async () => {
-    const response = await s3Service.find()
-    for (let i = 0; i < response.length; i++) {
-      await s3Service.remove(response[i].Key)
-    }
   })
 
   // run the scenarios
