@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import fs from 'fs'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
@@ -17,6 +18,25 @@ let service
 let expressServer
 let inputId
 let outputIds = []
+
+function csvImportTransform (chunk) {
+  const newChunk = []
+  _.forEach(chunk, object => {
+    let newObject = _.omit(object, 'Index', 'Organization Id')
+    newObject.Founded = _.toNumber(object.Founded)
+    newObject['Number of employees'] = _.toNumber(object['Number of employees'])
+    newChunk.push(newObject)
+  })
+  return newChunk
+}
+
+function csvExportTransform (chunk) {
+  const newChunk = []
+  _.forEach(chunk, object => {
+    newChunk.push(_.omit(object, '_id'))
+  })
+  return newChunk
+}
 
 const options = {
   s3ServicePath: 'path-to-s3',
@@ -120,9 +140,7 @@ const scenarios = [
       method: 'export',
       servicePath: 'records',
       query: { $select: ['Name', 'Industry', 'Founded'] },
-      transform:{
-        omit: [ '_id' ]
-      }
+      transform: 'csv-export-transform'
     },
     expect: {
       import: {
@@ -235,6 +253,10 @@ describe('feathers-import-export', () => {
     app.use('import-export', new Service(Object.assign(options, { app })))
     service = app.service('import-export')
     expect(service).toExist()
+    // register transformations
+    service.registerTransform('csv-import-transform', csvImportTransform)
+    service.registerTransform('csv-export-transform', csvExportTransform)
+    // run the server
     expressServer = await app.listen(3333)
   })
 
