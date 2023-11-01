@@ -38,77 +38,112 @@ const options = {
 
 const scenarios = [
   {
-    name: 'json',
-    contentType: 'application/json',
-    service: 'objects',
+    name: 'objects',
+    dataset: 'objects.json',
+    upload: {
+      contentType: 'application/json'
+    },
     import: {
+      method: 'import',
+      id: 'objects.json',
+      servicePath: 'objects',
       transform: {
         omit: [ 'thumbnail', 'thumbnail_width', 'thumbnail_height', 'href' ]
-      },
-      objects: 36273
+      }
     },
     export: {
+      method: 'export',
+      servicePath: 'objects',
       query: { $and: [{ year: { $gte: 1970 } }, { year: { $lt: 2000 } }] },
       transform:{
         omit: [ '_id' ]
       },
-      objects: 6738,
-      size: 3385369
+      format: 'json'
+    },
+    expect: {
+      import: {
+        objects: 36273
+      },
+      export: {
+        objects: 6738,
+        size: 3385369
+      }
     }
-  },
-  {
-    name: 'geojson',
-    contentType: 'application/geo+json',
-    service: 'features',
+  }, {
+    name: 'features',
+    dataset: 'features.geojson',
+    upload: {
+      contentType: 'application/geo+json'
+    },
     import: {
-      objects: 255
+      method: 'import',
+      id: 'features.geojson',
+      servicePath: 'features'
     },
     export: {
+      method: 'export',
+      servicePath: 'features',
+      chunkSize: 100,      
       transform:{
         omit: [ '_id' ]
       },
-      chunkSize: 100,
-      objects: 255,
-      size: 21365820
+      format: 'geojson'
+    },
+    expect: {
+      import: {
+        objects: 255
+      }, 
+      export: {
+        objects: 255,
+        size: 21365820
+      }
     }
-  },
-  {
-    name: 'csv',
-    contentType: 'text/csv',
-    service: 'records',
+  }, {
+    name: 'records',
+    dataset: 'records.csv',
+    upload: {
+      contentType: 'text/csv',
+    },
     import: {
+      method: 'import',
+      id: 'records.csv',
+      servicePath: 'records',
       transform: {
         omit: [ 'Index', 'Organization Id' ],
         unitMapping: {
           Founded: { asNumber: true },
           'Number of employees': { asNumber: true }
         }
-      },
-      objects: 100000,
+      }
     }, 
     export: {
+      method: 'export',
+      servicePath: 'records',
+      query: { $select: ['Name', 'Industry', 'Founded'] },
       transform:{
         omit: [ '_id' ]
+      }
+    },
+    expect: {
+      import: {
+        objects: 100000
       },
-      query: { $select: ['Name', 'Industry', 'Founded'] },
-      objects: 100000,
-      size: 4329209
+      export: {
+        objects: 100000,
+        size: 7562663
+      }
     }
   }
 ]
 
-function getDataset (scenario) {
-  return `${scenario.service}.${scenario.name}`
-}
-
 function runTests (scenario) {
   it(`[${scenario.name}] unzip input dataset`, async () => {
-    await unzipDataset(getDataset(scenario))
+    await unzipDataset(scenario.dataset)
   })
   it(`[${scenario.name}] upload input dataset`, async () => {
     const response = await s3Service.uploadFile({
-      filePath: getTmpPath(getDataset(scenario)),
-      contentType: scenario.contentType,
+      filePath: getTmpPath(scenario.dataset),
+      contentType: scenario.upload.contentType,
       chunkSize: 1024 * 1024 * 10
     })
     expect(response.id).toExist()
@@ -116,49 +151,30 @@ function runTests (scenario) {
   })
     .timeout(120000)
   it(`[${scenario.name}] import input dataset`, async () => {
-    const response = await service.create({
-      method: 'import',
-      id: inputId,
-      servicePath: scenario.service,
-      transform: scenario.import.transform
-    })
-    expect(response.objects).to.equal(scenario.import.objects)
+    const response = await service.create(scenario.import)
+    expect(response.objects).to.equal(scenario.expect.import.objects)
   })
     .timeout(120000)
   it(`[${scenario.name}] check imported collection`, async () => {
-    const service = app.service(scenario.service)
+    const service = app.service(scenario.import.servicePath)
     const response = await service.find()
-    expect(response.total).to.equal(scenario.import.objects)
+    expect(response.total).to.equal(scenario.expect.import.objects)
   })
   it(`[${scenario.name}] clean input dataset`, async () => {
     const response = await s3Service.remove(inputId)
     expect(response.$metadata.httpStatusCode).to.equal(204)
-    clearDataset(getDataset(scenario))
+    clearDataset(scenario.dataset)
   })
   it(`[${scenario.name}] export collection`, async () => {
-    const response = await service.create({
-      method: 'export',
-      servicePath: scenario.service,
-      query: scenario.export.query,
-      transform: scenario.export.transform,
-      format: scenario.name,
-      chunkSize: scenario.export.chunkSize
-    })
-    expect(response.objects).to.equal(scenario.export.objects)
+    const response = await service.create(scenario.export)
+    expect(response.objects).to.equal(scenario.expect.export.objects)
     expect(response.id).toExist()
     outputIds.push(response.id)
   })
     .timeout(180000)
   it(`[${scenario.name}] export collection without gzip compression`, async () => {
-    const response = await service.create({
-      method: 'export',
-      servicePath: scenario.service,
-      query: scenario.export.query,
-      transform: scenario.export.transform,      
-      format: scenario.name,
-      chunkSize: scenario.export.chunkSize,
-      gzip: false
-    })
+    const response = await service.create(Object.assign(scenario.export, { gzip: false }))
+    expect(response.objects).to.equal(scenario.expect.export.objects)
     expect(response.id).toExist()
     outputIds.push(response.id)
   })
@@ -175,11 +191,11 @@ function runTests (scenario) {
     }
     // check the size of the uncompressed file 
     let size = fs.statSync(getTmpPath(outputIds[1])).size
-    expect(size).to.equal(scenario.export.size)
+    expect(size).to.equal(scenario.expect.export.size)
     // unzip the compressed file (replace the uncompressed file) to check the size
     await unzipFile(getTmpPath(outputIds[0]), getTmpPath(outputIds[1]))
     size = fs.statSync(getTmpPath(outputIds[1])).size
-    expect(size).to.equal(scenario.export.size)
+    expect(size).to.equal(scenario.expect.export.size)
   })
   it(`[${scenario.name}] clean output files`, async () => {
     for (let i = 0; i < 2; i++) {
@@ -206,8 +222,8 @@ describe('feathers-import-export', () => {
   it('create the services', async () => {
     // create mongo services
     for (const scenario of scenarios) {
-      app.use(scenario.service, await createMongoService(scenario.service))
-      expect(app.service(scenario.service)).toExist()
+      app.use(scenario.name, await createMongoService(scenario.name))
+      expect(app.service(scenario.name)).toExist()
     }
     // create s3 service
     app.use('path-to-s3', new S3Service(options.s3Options), {
@@ -222,11 +238,18 @@ describe('feathers-import-export', () => {
     expressServer = await app.listen(3333)
   })
 
+  it('clean import/export bucket dir', async () => {
+    const response = await s3Service.find()
+    for (let i = 0; i < response.length; i++) {
+      await s3Service.remove(response[i].Key)
+    }
+  })
+
   // run the scenarios
   for (const scenario of scenarios) runTests(scenario)
 
   after(async () => {
-    for (const scenario of scenarios) await removeMongoService(scenario.service)
+    for (const scenario of scenarios) await removeMongoService(scenario.name)
     await expressServer.close()
   })
 })
