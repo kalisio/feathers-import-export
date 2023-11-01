@@ -20,28 +20,20 @@ let inputId
 let outputIds = []
 
 function csvImportTransform (chunk) {
-  const newChunk = []
   _.forEach(chunk, object => {
     delete object.Index
     delete object['Organization Id']
     object.Founded = _.toNumber(object.Founded)
     object['Number of employees'] = _.toNumber(object['Number of employees'])
-
-    /*let newObject = _.omit(object, 'Index', 'Organization Id')
-    newObject.Founded = _.toNumber(object.Founded)
-    newObject['Number of employees'] = _.toNumber(object['Number of employees'])
-    newChunk.push(newObject)*/
   })
-  //return newChunk
   return chunk
 }
 
 function csvExportTransform (chunk) {
-  const newChunk = []
   _.forEach(chunk, object => {
-    newChunk.push(_.omit(object, '_id'))
+    delete object._id
   })
-  return newChunk
+  return chunk
 }
 
 const options = {
