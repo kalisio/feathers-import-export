@@ -66,15 +66,15 @@ const scenarios = [
       id: 'objects.json',
       servicePath: 'objects',
       transform: {
-        omit: [ 'thumbnail', 'thumbnail_width', 'thumbnail_height', 'href' ]
+        omit: ['thumbnail', 'thumbnail_width', 'thumbnail_height', 'href']
       }
     },
     export: {
       method: 'export',
       servicePath: 'objects',
       query: { $and: [{ year: { $gte: 1970 } }, { year: { $lt: 2000 } }] },
-      transform:{
-        omit: [ '_id' ]
+      transform: {
+        omit: ['_id']
       },
       format: 'json'
     },
@@ -101,16 +101,16 @@ const scenarios = [
     export: {
       method: 'export',
       servicePath: 'features',
-      chunkSize: 100,      
-      transform:{
-        omit: [ '_id' ]
+      chunkSize: 100,
+      transform: {
+        omit: ['_id']
       },
       format: 'geojson'
     },
     expect: {
       import: {
         objects: 255
-      }, 
+      },
       export: {
         objects: 255,
         size: 21365820
@@ -120,20 +120,20 @@ const scenarios = [
     name: 'records',
     dataset: 'records.csv',
     upload: {
-      contentType: 'text/csv',
+      contentType: 'text/csv'
     },
     import: {
       method: 'import',
       id: 'records.csv',
       servicePath: 'records',
       transform: {
-        omit: [ 'Index', 'Organization Id' ],
+        omit: ['Index', 'Organization Id'],
         unitMapping: {
           Founded: { asNumber: true },
           'Number of employees': { asNumber: true }
         }
       }
-    }, 
+    },
     export: {
       method: 'export',
       servicePath: 'records',
@@ -205,7 +205,7 @@ function runTests (scenario) {
       const response = await s3Service.downloadFile({ id: outputIds[i], filePath: tmpFilePath })
       expect(response.id).toExist()
     }
-    // check the size of the uncompressed file 
+    // check the size of the uncompressed file
     let size = fs.statSync(getTmpPath(outputIds[1])).size
     expect(size).to.equal(scenario.expect.export.size)
     // unzip the compressed file (replace the uncompressed file) to check the size
