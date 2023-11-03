@@ -177,16 +177,19 @@ transform: {
 
 The transformation function must be [registered](#registertransform-key-transform) in the service.
 
-The function must have the following signature: `function myTrasnform (chunk)` where `chunk` represents an array of JSON objects.
+The function must have the following signature: `function myTrasnform (chunk, options)` where 
+* `chunk` represents an array of JSON objects.
+* `options` represents the options passed to the `import` or `export` methods. It allows you to retrieve some contextual data if needed when processing the chunk.
 
 ```js
-function myTrasnform (chunk) {
+function myTrasnform (chunk, options) {
   chunk.forEach(object => {
     // mutate object
   })
   return chunk
 }
 ```
+
 To specify the transformation function within the **import** or **export** payload, you must declare assign to the `transform` property the **key** used to register the function
 
 Assuming you have register the function `myTransform` with the key `my-transform`, then you can declare the transformation function as below:
