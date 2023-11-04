@@ -37,7 +37,6 @@ function csvExportTransform (chunk) {
 }
 
 const options = {
-  s3ServicePath: 'path-to-s3',
   workingDir: './test/tmp',
   s3Options: {
     s3Client: {

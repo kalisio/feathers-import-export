@@ -8,13 +8,15 @@
 
 > `feathers-import-export` provides convenient methods to import/export to/from FeathersJS services.
 
+`feathers-import-export` has been specially designed to process large volumes of data and to overcome data transfer problems during import and export, it relies on the capabilities of the S3 API. 
 
-`feathers-import-export` has been specially designed to process large volumes of data and to overcome data transfer problems during import and export, it relies on the capabilities of the S3 API. Thus the use is based on the use of a store which offers an **S3 compatible API**.
+> WARNING 
+> 
+> Consequently, the use of this library requires being able to operate a store compatible with the **S3 API**.
 
 > NOTE
 >
-> To deals with the objects in the stores, `feathers-import-export` relies on the [feathers-s3](https://github.com/kalisio/feathers-s3) library.
-
+> To deals with the objects in the stores, `feathers-import-export` relies on the [feathers-s3](https://github.com/kalisio/feathers-s3) library. It is highly recommended to read a little more about this library.
 
 ## Principle
 
@@ -44,6 +46,68 @@ yarn add @kalisio/feathers-import-export
 
 ### Example
 
+#### Setup the service
+
+Assuming you have setup a Feathers app:
+
+```js
+// Import Feathers stufff
+import { Service } from '@kalisio/feathers-import-export'
+
+// Setup Feathers app
+
+const options = {
+  s3Options: {
+    s3Client: {
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+      },
+      endpoint: process.env.S3_ENDPOINT,
+      region: process.env.S3_REGION,
+      signatureVersion: 'v4'
+    },
+    bucket: process.env.S3_BUCKET,
+    prefix: 'tmp' // a folder used to store imported/exporter files
+  },
+  app,
+  workingDir: process.env.TMP_DIR,
+}
+
+app.use('import-export', new Service(options))
+```
+
+The `s3Options` options are described in [feathers-s3](https://github.com/kalisio/feathers-s3#constructor-options)
+
+#### Import data from a file
+
+The following command import the data read from a file `data.csv` into the service `my-service`:
+
+```js
+const response = await app.service('import-export').create({
+  method: 'import',
+  id: 'key/to/the/file/in/the/bucket'   // file key into the bucket
+  servicePath: 'path/to/service'        // path to the service where to import the data
+})
+```
+
+> NOTE
+>
+> This method assumes that you have allready uploaded the file.
+
+#### Export data to a flie
+
+The following command export data from the service `my-service` into the file `data.csv`
+
+```js
+const response = await app.service('import-export').create({
+  method: 'export',
+  servicePath: 'path/to/my-service',
+  filename: 'data.csv',
+  format: 'csv'
+})
+```
+
 ## API
 
 `feathers-import-export` consists in a single service that provides the following methods:
@@ -54,9 +118,9 @@ Create an instance of the service with the given options:
 
 | Parameter | Description | Required |
 |---|---|---|
-|`s3ServicePath` | the path to the s3Service to be retrieved from the `app`. | yes |
-| `workingDir` | the working directory to process temporary files. Default value is `/tmp` | no |
-
+|`s3Options` | the options to configure the S3 service. Refer to [feathers-s3](https://github.com/kalisio/feathers-s3#constructor-options) API. | yes |
+| `app` | the feathers app. | yes |
+| `workingDir` | the working directory to process temporary files. Default value is `/tmp`. | no |
 
 ### registerTransform (key, transform)
 
