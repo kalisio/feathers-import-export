@@ -81,7 +81,7 @@ The `s3Options` options are described in [feathers-s3](https://github.com/kalisi
 
 #### Import data from a file
 
-The following command import the data read from a file `data.csv` into the service `my-service`:
+Import data from a file `data.csv` into the service `my-service`:
 
 ```js
 const response = await app.service('import-export').create({
@@ -97,7 +97,7 @@ const response = await app.service('import-export').create({
 
 #### Export data to a flie
 
-The following command export data from the service `my-service` into the file `data.csv`
+Export data from the service `my-service` into the file `data.csv`:
 
 ```js
 const response = await app.service('import-export').create({
