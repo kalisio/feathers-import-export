@@ -16,11 +16,11 @@
 
 > NOTE
 >
-> To deals with the objects in the stores, `feathers-import-export` relies on the [feathers-s3](https://github.com/kalisio/feathers-s3) library. It is highly recommended to read a little more about this library.
+> To deal with the objects in the stores, `feathers-import-export` relies on the [feathers-s3](https://github.com/kalisio/feathers-s3) library. It is highly recommended to read a little more about this library upfront.
 
 ## Principle
 
-The following sections illustrate the different process implemented by `feathers-import-export`:
+The following sections illustrate the different processes implemented by `feathers-import-export`:
 
 ### Import
 
@@ -81,7 +81,7 @@ The `s3Options` options are described in [feathers-s3](https://github.com/kalisi
 
 #### Import data from a file
 
-Import data from a file `data.csv` into the service `my-service`:
+Import data from a `data.csv` file into the `my-service` service:
 
 ```js
 const response = await app.service('import-export').create({
@@ -93,11 +93,11 @@ const response = await app.service('import-export').create({
 
 > NOTE
 >
-> This method assumes that you have allready uploaded the file.
+> This method assumes that you have already uploaded the file.
 
 #### Export data to a flie
 
-Export data from the service `my-service` into the file `data.csv`:
+Export data from the `my-service` service into the `data.csv` file:
 
 ```js
 const response = await app.service('import-export').create({
@@ -151,13 +151,13 @@ The payload `data` must contain the following properties:
 
 | Argument | Description | Required |
 |---|---|---|
-| `id` | the object key. Note that the final computed **Key** takes into account the `prefix` option of the service. | yes |
+| `id` | the object key. Note that the final computed **key** takes into account the `prefix` option of the service. | yes |
 | `servicePath` | the path to the service into which to import the data. | yes |
 | `transform`| the [transformation](./#transformation) to apply before importing the data. Defaut is `undefined` | no |
 
 ### export (data, params)
 
-Exports the result of a query into a **JSON**, **CSV** or **GeoJson** file that it stored on an **S3** compatbile storage. The file can be compressed using [GZip](https://www.gzip.org/).
+Exports the result of a query into a **JSON**, **CSV** or **GeoJson** file that it stored on an **S3** compatible storage. The file can be compressed using [GZip](https://www.gzip.org/).
 By default It returns a **Presigned URL** to the file.
 
 The payload `data` must contain the following properties:
@@ -182,30 +182,30 @@ The payload `data` must contain the following properties:
 
 As illustrated in the previous sections, `feathers-import-export` allows you to apply a **transformation** before importing or exporting the data.
 
-The transformation can be carried out via a **transform** object or via un function.
+The transformation can be carried out via a **transform** object or via a function.
 
 ### Transform object
 
 The **transform** object can be declared with the following specifications:
 
-* `toArray`: boolean indicating if the JSON object will be transformed into an array using Lodash (opens new window), defaults to false
+* `toArray`: boolean indicating if the JSON object will be transformed into an array using [Lodash](https://lodash.com/docs#toArray), defaults to false
 * `toObjects`: if your input JSON objects are flat arrays it will be transformed into objects according to the given indexed list of property names to be used as keys, not defined by default
 * `filter`: a filter to be applied on the JSON object using any option supported by [sift](https://github.com/crcn/sift.js)
 * `mapping`: a map between input key path and output key path supporting dot notation, the values of the map can also be a structure like this:
   * `path`: output key path
   * `value`: a map between input values and output values
   * `delete`: boolean indicating if the input key path should be deleted or not after mapping
-* `unitMapping`: a map between input key path supporting dot notation and from/to units to convert using math.js (opens new window)for numbers or moment.js (opens new window)for dates, a value of the map is a structure like this:
+* `unitMapping`: a map between input key path supporting dot notation and from/to units to convert using [math.js](http://mathjs.org/docs/datatypes/units.html) for numbers or [moment.js](https://momentjs.com/) for dates, a value of the map is a structure like this:
   * `from`: the unit or date format to convert from, e.g. feet or YYYY-MM-DD HH:mm:ss.SSS
   * `to`: the unit or date format to convert to, e.g. m or MM-DD-YYYY HH:mm:ss.SSS, if given for a date the date object will be converted back to string
   * `asDate`: mandatory to indicate if the value is a date, could be utc or local to interpret it as UTC or Local Time
-asString: mandatory to convert numbers to strings, indicates the radix (opens new window)to be used if any
+asString: mandatory to convert numbers to strings, indicates the [radix](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toString#Syntax) to be used if any
   * `asNumber`: mandatory to convert strings to numbers
-  * `asCase`: target case to be used as the name of a Lodash (opens new window)(e.g. lowerCase) or JS string (opens new window)(e.g. toUpperCase) case conversion function (e.g. lowerCase)
+  * `asCase`: target case to be used as the name of a [Lodash](https://lodash.com/docs/4.17.15#lowerCase) (e.g. `lowerCase`) or [JS string](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/String) (e.g. toUpperCase) case conversion function (e.g. lowerCase)
   * `empty`: value to be set if the input value is empty
-* `pick`: an array of properties to be picked using Lodash(opens new window)
-* `omit`: an array of properties to be omitted using Lodash(opens new window)
-merge: an object to be merged with each JSON objects using Lodash(opens new window)
+* `pick`: an array of properties to be picked using [Lodash](https://lodash.com/docs#pick)
+* `omit`: an array of properties to be omitted using [Lodash](https://lodash.com/docs#omit)
+merge: an object to be merged with each JSON objects using [Lodash](https://lodash.com/docs#merge)
 * `asObject`: this boolean indicates if the output should be transformed into an object if the array contains a single object, defaults to false
 * `asArray`: this boolean indicates if the output should be transformed into an array containing the object, defaults to false.
 
@@ -254,9 +254,9 @@ function myTrasnform (chunk, options) {
 }
 ```
 
-To specify the transformation function within the **import** or **export** payload, you must declare assign to the `transform` property the **key** used to register the function
+To specify the transformation function within the **import** or **export** payload, you must assign to the `transform` property the **key** used to register the function
 
-Assuming you have register the function `myTransform` with the key `my-transform`, then you can declare the transformation function as below:
+Assuming you have registered the `myTransform` function with the `my-transform` key, then you can declare the transformation function as below:
 
 ```js
 transform: 'my-transform'
