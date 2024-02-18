@@ -10,12 +10,10 @@
 
 `feathers-import-export` has been specially designed to process large volumes of data and to overcome data transfer problems during import and export, it relies on the capabilities of the S3 API. 
 
-> WARNING 
-> 
+> [!WARNING]
 > Consequently, the use of this library requires being able to operate a store compatible with the **S3 API**.
 
-> NOTE
->
+> [!NOTE]
 > To deal with the objects in the stores, `feathers-import-export` relies on the [feathers-s3](https://github.com/kalisio/feathers-s3) library. It is highly recommended to read a little more about this library upfront.
 
 ## Principle
@@ -91,8 +89,7 @@ const response = await app.service('import-export').create({
 })
 ```
 
-> NOTE
->
+> [!NOTE]
 > This method assumes that you have already uploaded the file.
 
 #### Export data to a flie
@@ -174,8 +171,7 @@ The payload `data` must contain the following properties:
 | `signedUrl` | whether to return a signed url. Default value is `true` | no |
 | `expiresIn` | the expiration delay of the returned signed url. Default value is `300` | no |
 
-> WARNING
->
+> [!WARNING]
 > The `chunkSize` must be less than the `max` property of the `paginate` options assigned to the service.
 
 ## Transformation
@@ -233,8 +229,7 @@ transform: {
 }
 ```
 
-> TIP
->
+> [!TIP]
 > The transformations are applied in the order of the documentation, e.g. filtering occurs before mapping.
 
 ### Transform function
