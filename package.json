@@ -1,7 +1,7 @@
 {
   "name": "@kalisio/feathers-import-export",
   "description": "Import/Export data with FeathersJS",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/kalisio/feathers-import-export",
   "main": "lib/index.js",
   "type": "module",
