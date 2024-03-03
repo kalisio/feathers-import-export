@@ -6,7 +6,7 @@
 [![Test Coverage](https://codeclimate.com/github/kalisio/feathers-import-export/badges/coverage.svg)](https://codeclimate.com/github/kalisio/feathers-import-export/coverage)
 [![Download Status](https://img.shields.io/npm/dm/@kalisio/feathers-import-export.svg?style=flat-square)](https://www.npmjs.com/package/@kalisio/feathers-import-export)
 
-> `feathers-import-export` provides convenient methods to import/export to/from FeathersJS services.
+> `feathers-import-export` provides convenient methods to import/export to/from [Feathers services](https://feathersjs.com/api/services.html).
 
 `feathers-import-export` has been specially designed to process large volumes of data and to overcome data transfer problems during import and export, it relies on the capabilities of the S3 API. 
 
@@ -92,7 +92,7 @@ const response = await app.service('import-export').create({
 > [!NOTE]
 > This method assumes that you have already uploaded the file.
 
-#### Export data to a flie
+#### Export data to a file
 
 Export data from the `my-service` service into the `data.csv` file:
 
@@ -256,11 +256,13 @@ Assuming you have registered the `myTransform` function with the `my-transform` 
 ```js
 transform: 'my-transform'
 ```
-## Export hooks
+## Hooks
 
-The `export` method internally uses the [uploadFile method](https://github.com/kalisio/feathers-s3?tab=readme-ov-file#uploadfile-data-params) exposed from the **S3 service**. In some cases it might be practical to add a **before hook** to perform specific processing. Indeed, it can allow to convert the data to an non a pivot format. Indeed, this can make it possible to carry out processing on the entire dataset unlike **Transformation** which applies to a chunk.
+As mentionned before `feathers-import-export` relies on [feathers-s3](https://github.com/kalisio/feathers-s3), particularly on the methods [getObjectCommand](https://github.com/kalisio/feathers-s3?tab=readme-ov-file#getobjectcommand-data-params) and [uploadFile](https://github.com/kalisio/feathers-s3?tab=readme-ov-file#uploadfile-data-params) wich are used respectively by the `import` and `export` methods. Consequently, you have the flexibility to register hooks on these methods to incorporate additional processing steps. For instance, it might be practical to include a before hook on the `uploadFile` method to execute preprocessing on the entire file before transferring it to the storage, such as converting it to another file format.
 
-You can register hooks by accessing the internal S3 service and assigning any hooks on the `uploadFile` method:
+### Registering hooks
+
+Hooks can be registered by accessing the internal **S3 service**, as demonstrated below:
 
 ```js
 app.use('path-to-service', new Service(Object.assign(options, { app })))
@@ -271,6 +273,14 @@ service.s3Service.hooks({
   }
 })
 ```
+### Predefined hooks
+
+#### geojson2shp
+
+This hook converts exported **GeoJSON** data to [ESRI Shapefile](https://en.wikipedia.org/wiki/Shapefile) format using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html). The output file is a compressed archive containing `.shp`, `.shx`, `.dbf` and other side-car files of one or several layers.
+
+> [!NOTE]
+> To be executed the `filename` option must have the extention `shp.zip`. Otherwise the hook is skipped.
 
 ## License
 
