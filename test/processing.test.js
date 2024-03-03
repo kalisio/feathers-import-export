@@ -7,7 +7,7 @@ import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import { Service } from '../lib/index.js'
 import { createMongoService, removeMongoService } from './utils.mongodb.js'
-import { getTmpPath, unzipDataset, clearDataset, unzipFile } from './utils.dataset.js'
+import { getTmpPath, unzipDataset, clearDataset } from './utils.dataset.js'
 import makeDebug from 'debug'
 import { execSync } from 'child_process'
 
