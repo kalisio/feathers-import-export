@@ -30,6 +30,8 @@ before-script:
 - git clone https://oauth2:$GITHUB_TOKEN@github.com/kalisio/feathers-s3 feathers-s3
 - cd feathers-s3 && yarn && yarn link
 - cd .. && yarn link @kalisio/feathers-s3
+# gdal
+- sudo apt-get install gdal-bin
 
 script:
 #- export DEBUG="feathers-import-export:*"
