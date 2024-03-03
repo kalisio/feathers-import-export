@@ -72,6 +72,7 @@ const scenarios = [
   }
 ]
 
+// this hook requires GDAL 3.1
 async function geojson2shp (hook) {
   const uuid = path.basename(hook.data.filePath)
   const geojsonFilename = hook.data.context.filename.replace('shp.zip', 'geojson')
@@ -144,7 +145,7 @@ function runTests (scenario) {
   })
 }
 
-describe('feathers-import-export-processing', () => {
+describe('feathers-import-export-hooks', () => {
   before(() => {
     chailint(chai, util)
     app = express(feathers())
