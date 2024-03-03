@@ -79,14 +79,11 @@ async function geojson2shp (hook) {
   const shpFilename = hook.data.context.filename
   const shpFilePath =  hook.data.filePath.replace(uuid, shpFilename)
   // change the geojson filename to ensure the final zip files will be named correctly
-  const cmd1 = `mv ${hook.data.filePath} ${geojsonFilePath}`
-  const res1 = await execSync(cmd1)
+  await execSync(`mv ${hook.data.filePath} ${geojsonFilePath}`)
   // convert the geojson file intoa zipped shapefile
-  const cmd2 = `ogr2ogr -f 'ESRI Shapefile' ${shpFilePath} ${geojsonFilePath}`
-  const res2 = await execSync(cmd2)
+  await execSync(`ogr2ogr -f 'ESRI Shapefile' ${shpFilePath} ${geojsonFilePath}`)
   // restore the filename with the correct uuid
-  const cmd3 = `mv ${geojsonFilePath} ${hook.data.filePath}`
-  const res3 = await execSync(cmd3)
+  await execSync(`mv ${geojsonFilePath} ${hook.data.filePath}`)
   // update the content type
   hook.data.contentType = 'application/zip'
 }
