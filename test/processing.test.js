@@ -140,6 +140,8 @@ function runTests (scenario) {
     const response = await s3Service.remove(outputId)
     expect(response.$metadata.httpStatusCode).to.equal(204)
     clearDataset(outputId)
+    const res = await execSync('ls -al test/tmp')
+    console.log(res.toString())
     clearDataset(scenario.export.filename)
     outputId = undefined
   })
@@ -170,10 +172,10 @@ describe('feathers-import-export-processing', () => {
     s3Service = app.service('path-to-s3')
     expect(s3Service).toExist()
     // create import-export service
-      app.use('import-export', new Service(Object.assign(options, { app })))
-      service = app.service('import-export')
-      expect(service).toExist()
-      service.s3Service.hooks({
+    app.use('import-export', new Service(Object.assign(options, { app })))
+    service = app.service('import-export')
+    expect(service).toExist()
+    service.s3Service.hooks({
       before: {
         uploadFile: [geojson2shp]
       }
