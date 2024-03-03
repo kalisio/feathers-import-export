@@ -260,8 +260,6 @@ transform: 'my-transform'
 
 The `export` method internally uses the [uploadFile method](https://github.com/kalisio/feathers-s3?tab=readme-ov-file#uploadfile-data-params) exposed from the **S3 service**. In some cases it might be practical to add a **before hook** to perform specific processing. Indeed, it can allow to convert the data to an non a pivot format. Indeed, this can make it possible to carry out processing on the entire dataset unlike **Transformation** which applies to a chunk.
 
-### Register hooks
-
 You can register hooks by accessing the internal S3 service and assigning any hooks on the `uploadFile` method:
 
 ```js
