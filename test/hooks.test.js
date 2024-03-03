@@ -1,15 +1,13 @@
 import fs from 'fs'
-import path from 'path'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
 import { Service as S3Service } from '@kalisio/feathers-s3'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
-import { Service } from '../lib/index.js'
+import { Service, hooks } from '../lib/index.js'
 import { createMongoService, removeMongoService } from './utils.mongodb.js'
 import { getTmpPath, unzipDataset, clearDataset } from './utils.dataset.js'
 import makeDebug from 'debug'
-import { execSync } from 'child_process'
 
 feathers.setDebug(makeDebug)
 
@@ -71,23 +69,6 @@ const scenarios = [
     }
   }
 ]
-
-// this hook requires GDAL 3.1
-async function geojson2shp (hook) {
-  const uuid = path.basename(hook.data.filePath)
-  const geojsonFilename = hook.data.context.filename.replace('shp.zip', 'geojson')
-  const geojsonFilePath = hook.data.filePath.replace(uuid, geojsonFilename)
-  const shpFilename = hook.data.context.filename
-  const shpFilePath =  hook.data.filePath.replace(uuid, shpFilename)
-  // change the geojson filename to ensure the final zip files will be named correctly
-  await execSync(`mv ${hook.data.filePath} ${geojsonFilePath}`)
-  // convert the geojson file intoa zipped shapefile
-  await execSync(`ogr2ogr -f 'ESRI Shapefile' ${shpFilePath} ${geojsonFilePath}`)
-  // restore the filename with the correct uuid
-  await execSync(`mv ${shpFilePath} ${hook.data.filePath} && rm ${geojsonFilePath}`)
-  // update the content type
-  hook.data.contentType = 'application/zip'
-}
 
 function runTests (scenario) {
   it(`[${scenario.name}] unzip input dataset`, async () => {
@@ -175,7 +156,7 @@ describe('feathers-import-export-hooks', () => {
     expect(service).toExist()
     service.s3Service.hooks({
       before: {
-        uploadFile: [geojson2shp]
+        uploadFile: [hooks.geojson2shp]
       }
     })
     expect(service).toExist()
