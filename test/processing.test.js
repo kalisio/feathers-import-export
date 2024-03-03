@@ -66,7 +66,7 @@ const scenarios = [
       },
       export: {
         objects: 255,
-        size: 21365820
+        size: 5323869
       }
     }
   }
@@ -83,7 +83,7 @@ async function geojson2shp (hook) {
   // convert the geojson file intoa zipped shapefile
   await execSync(`ogr2ogr -f 'ESRI Shapefile' ${shpFilePath} ${geojsonFilePath}`)
   // restore the filename with the correct uuid
-  await execSync(`mv ${geojsonFilePath} ${hook.data.filePath}`)
+  await execSync(`mv ${shpFilePath} ${hook.data.filePath} && rm ${geojsonFilePath}`)
   // update the content type
   hook.data.contentType = 'application/zip'
 }
@@ -140,9 +140,6 @@ function runTests (scenario) {
     const response = await s3Service.remove(outputId)
     expect(response.$metadata.httpStatusCode).to.equal(204)
     clearDataset(outputId)
-    const res = await execSync('ls -al test/tmp')
-    console.log(res.toString())
-    clearDataset(scenario.export.filename)
     outputId = undefined
   })
 }
