@@ -55,7 +55,7 @@ const scenarios = [
         omit: ['_id']
       },
       format: 'geojson',
-      gzip: false,      
+      gzip: false,
       filename: 'features.shp.zip'
     },
     expect: {
@@ -115,7 +115,7 @@ function runTests (scenario) {
     const response = await s3Service.downloadFile({ id: outputId, filePath: tmpFilePath })
     expect(response.id).toExist()
     // check the size of the uncompressed file
-    let size = fs.statSync(getTmpPath(outputId)).size
+    const size = fs.statSync(getTmpPath(outputId)).size
     expect(size).to.equal(scenario.expect.export.size)
   })
   it(`[${scenario.name}] clean output files`, async () => {
