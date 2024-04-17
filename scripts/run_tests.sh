@@ -16,8 +16,11 @@ NODE_VER=16
 MONGO_VER=""
 CI_STEP_NAME="Run tests"
 CODE_COVERAGE=false
-while getopts "n:cr:" option; do
+while getopts "m:n:cr:" option; do
     case $option in
+        m) # defines mongo version
+            MONGO_VER=$OPTARG
+            ;;
         n) # defines node version
             NODE_VER=$OPTARG
              ;;
@@ -38,6 +41,17 @@ done
 ##
 
 . "$WORKSPACE_DIR/development/workspaces/libs/libs.sh" feathers-import-export
+
+## Start mongo
+##
+
+begin_group "Starting mongo $MONGO_VER ..."
+
+use_mongo "$MONGO_VER"
+k-mongo
+
+end_group "Starting mongo $MONGO_VER ..."
+
 
 ## Run tests
 ##
