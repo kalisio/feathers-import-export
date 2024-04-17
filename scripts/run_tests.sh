@@ -48,7 +48,8 @@ done
 begin_group "Starting mongo $MONGO_VER ..."
 
 use_mongo "$MONGO_VER"
-k-mongo
+#k-mongo
+mongod --fork
 
 end_group "Starting mongo $MONGO_VER ..."
 
