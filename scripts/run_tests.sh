@@ -49,7 +49,7 @@ begin_group "Starting mongo $MONGO_VER ..."
 
 use_mongo "$MONGO_VER"
 #k-mongo
-mongod --fork --syslog
+mongod --smallfiles
 
 end_group "Starting mongo $MONGO_VER ..."
 
