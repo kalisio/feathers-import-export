@@ -42,19 +42,6 @@ done
 
 . "$WORKSPACE_DIR/development/workspaces/libs/libs.sh" feathers-import-export
 
-## Start mongo
-##
-
-begin_group "Starting mongo $MONGO_VER ..."
-
-use_mongo "$MONGO_VER"
-# k-mongo
-#mongod --smallfiles
-mongod --dbpath /var/lib/mongo --logpath /var/log/mongodb/mongod.log --port 27017 &
-
-end_group "Starting mongo $MONGO_VER ..."
-
-
 ## Run tests
 ##
 
