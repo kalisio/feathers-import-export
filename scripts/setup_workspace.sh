@@ -39,4 +39,3 @@ fi
 setup_lib_workspace "$WORKSPACE_DIR" "$DEVELOPMENT_REPO_URL" "https://github.com/kalisio/feathers-s3"
 
 end_group "Setting up workspace ..."
-
