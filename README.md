@@ -1,7 +1,7 @@
 # feathers-import-export
 
 [![Latest Release](https://img.shields.io/github/v/tag/kalisio/feathers-import-export?sort=semver&label=latest)](https://github.com/kalisio/feathers-import-export/releases)
-[![Build Status](https://app.travis-ci.com/kalisio/feathers-import-export.svg?branch=master)](https://app.travis-ci.com/kalisio/feathers-import-export)
+[![ci](https://github.com/kalisio/feathers-import-export/actions/workflows/main.yaml/badge.svg)](https://github.com/kalisio/feathers-import-export/actions/workflows/main.yaml)
 [![Code Climate](https://codeclimate.com/github/kalisio/feathers-import-export/badges/gpa.svg)](https://codeclimate.com/github/kalisio/feathers-import-export)
 [![Test Coverage](https://codeclimate.com/github/kalisio/feathers-import-export/badges/coverage.svg)](https://codeclimate.com/github/kalisio/feathers-import-export/coverage)
 [![Download Status](https://img.shields.io/npm/dm/@kalisio/feathers-import-export.svg?style=flat-square)](https://www.npmjs.com/package/@kalisio/feathers-import-export)
