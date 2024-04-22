@@ -1,4 +1,5 @@
 import fs from 'fs'
+import crypto from 'crypto'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
 import { Service as S3Service } from '@kalisio/feathers-s3'
@@ -31,7 +32,7 @@ const options = {
       signatureVersion: 'v4'
     },
     bucket: process.env.S3_BUCKET,
-    prefix: Date.now().toString()
+    prefix: crypto.randomUUID()
   }
 }
 
