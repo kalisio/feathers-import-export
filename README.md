@@ -4,6 +4,7 @@
 [![ci](https://github.com/kalisio/feathers-import-export/actions/workflows/main.yaml/badge.svg)](https://github.com/kalisio/feathers-import-export/actions/workflows/main.yaml)
 [![Code Climate](https://codeclimate.com/github/kalisio/feathers-import-export/badges/gpa.svg)](https://codeclimate.com/github/kalisio/feathers-import-export)
 [![Test Coverage](https://codeclimate.com/github/kalisio/feathers-import-export/badges/coverage.svg)](https://codeclimate.com/github/kalisio/feathers-import-export/coverage)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Download Status](https://img.shields.io/npm/dm/@kalisio/feathers-import-export.svg?style=flat-square)](https://www.npmjs.com/package/@kalisio/feathers-import-export)
 
 > `feathers-import-export` provides convenient methods to import/export to/from [Feathers services](https://feathersjs.com/api/services.html).
