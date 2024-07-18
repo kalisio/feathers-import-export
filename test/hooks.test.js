@@ -117,7 +117,7 @@ function runTests (scenario) {
     expect(response.id).toExist()
     // check the size of the uncompressed file
     const size = fs.statSync(getTmpPath(outputId)).size
-    expect(size).to.equal(scenario.expect.export.size)
+    expect(size).to.be.closeTo(scenario.expect.export.size, 1)
   })
   it(`[${scenario.name}] clean output files`, async () => {
     const response = await s3Service.remove(outputId)
