@@ -126,7 +126,7 @@ Register a transformation function for the given key.
 
 | Parameter | Description | Required |
 |---|---|---|
-|`key` | the key assigend to the transformation function. | yes |
+|`key` | the key assigned to the transformation function. | yes |
 | `transform` | the transformation function. | yes |
 
 ### create (data, params)
@@ -137,7 +137,7 @@ The payload `data` must contain the following properties:
 
 | Argument | Description | Required |
 |---|---|---|
-| `method` | the method to call, either `ìmport` or `export`. | yes |
+| `method` | the method to call, either `import` or `export`. | yes |
 
 Concerning the other properties, refer to the description of the different methods.
 
@@ -151,7 +151,7 @@ The payload `data` must contain the following properties:
 |---|---|---|
 | `id` | the object key. Note that the final computed **key** takes into account the `prefix` option of the service. | yes |
 | `servicePath` | the path to the service into which to import the data. | yes |
-| `transform`| the [transformation](./#transformation) to apply before importing the data. Defaut is `undefined` | no |
+| `transform`| the [transformation](./#transformation) to apply before importing the data. Default is `undefined` | no |
 
 ### export (data, params)
 
@@ -165,9 +165,9 @@ The payload `data` must contain the following properties:
 | `servicePath` | the path to the service to be queried.| yes |
 | `query` | the query to apply. Default value is `{}` | no |
 | `chunkPath`| the path to the data when processing the query response. Default value is `data` | no |
-| `chunkSize` | the number of objects to be processed by chunk. Defaut value is `500` | no |
-| `transform`| the [transformation](./#transformation) to apply before expoting the data. Defaut is `undefined` | no |
-| `format` | the output format. Defaut value is `json` | no |
+| `chunkSize` | the number of objects to be processed by chunk. Default value is `500` | no |
+| `transform`| the [transformation](./#transformation) to apply before exporting the data. Default is `undefined` | no |
+| `format` | the output format. Défaut value is `json` | no |
 | `zip`| whether to zip the output or not. Default value is `true` | no |
 | `signedUrl` | whether to return a signed url. Default value is `true` | no |
 | `expiresIn` | the expiration delay of the returned signed url. Default value is `300` | no |
@@ -237,7 +237,7 @@ transform: {
 
 The transformation function must be [registered](#registertransform-key-transform) in the service.
 
-The function must have the following signature: `function myTrasnform (chunk, options)` where 
+The function must have the following signature: `function myTransform (chunk, options)` where 
 * `chunk` represents an array of JSON objects.
 * `options` represents the options passed to the `import` or `export` methods. It allows you to retrieve some contextual data if needed when processing the chunk.
 
@@ -259,7 +259,7 @@ transform: 'my-transform'
 ```
 ## Hooks
 
-As mentionned before `feathers-import-export` relies on [feathers-s3](https://github.com/kalisio/feathers-s3), particularly on the methods [getObjectCommand](https://github.com/kalisio/feathers-s3?tab=readme-ov-file#getobjectcommand-data-params) and [uploadFile](https://github.com/kalisio/feathers-s3?tab=readme-ov-file#uploadfile-data-params) wich are used respectively by the `import` and `export` methods. Consequently, you have the flexibility to register hooks on these methods to incorporate additional processing steps. For instance, it might be practical to include a before hook on the `uploadFile` method to execute preprocessing on the entire file before transferring it to the storage, such as converting it to another file format.
+As mentioned before `feathers-import-export` relies on [feathers-s3](https://github.com/kalisio/feathers-s3), particularly on the methods [getObjectCommand](https://github.com/kalisio/feathers-s3?tab=readme-ov-file#getobjectcommand-data-params) and [uploadFile](https://github.com/kalisio/feathers-s3?tab=readme-ov-file#uploadfile-data-params) which are used respectively by the `import` and `export` methods. Consequently, you have the flexibility to register hooks on these methods to incorporate additional processing steps. For instance, it might be practical to include a before hook on the `uploadFile` method to execute preprocessing on the entire file before transferring it to the storage, such as converting it to another file format.
 
 ### Registering hooks
 
@@ -281,7 +281,7 @@ service.s3Service.hooks({
 This hook converts exported **GeoJSON** data to [ESRI Shapefile](https://en.wikipedia.org/wiki/Shapefile) format using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html). The output file is a compressed archive containing `.shp`, `.shx`, `.dbf` and other side-car files of one or several layers.
 
 > [!NOTE]
-> To be executed the `filename` option must have the extention `shp.zip`. Otherwise the hook is skipped.
+> To be executed the `filename` option must have the extension `shp.zip`. Otherwise the hook is skipped.
 
 ## License
 
