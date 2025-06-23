@@ -280,12 +280,16 @@ service.s3Service.hooks({
 
 This hook converts exported **GeoJSON** data to any format using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html). 
 
-To trigger this hook, you must provide the following options to the `export` method: 
+To trigger this hook,you must declare the `convert` object in the `export` method with the following properties:
+* `ogrDriver`: any [Vector driver](https://gdal.org/en/stable/drivers/vector/index.html), e.g. `KML`,
+* `contentType`: file mime type; e.g. `application/vnd.google-earth.kml+xml`
+
+For instance: 
 
 ```js
 convert: {
-  ogrDriver: any [Vector driver](https://gdal.org/en/stable/drivers/vector/index.html), e.g. `KML`
-  contentType: file mime type; e.g. `application/vnd.google-earth.kml+xml`
+  ogrDriver: 'ESRI Shapefile',
+  contentType: 'application/zip'
 }
 ```
 
@@ -296,11 +300,13 @@ convert: {
 
 This hook allows to reproject the exported **GeoJSON** data to any **Coordinate Reference System** using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html). 
 
-To trigger this hook, you must provide the following options to the `export` method: 
+To trigger this hook, you must declare the `reproject` object in the `export` method with the following properties:
+* `srs`: any coordinate reference systems, e.g. `EPSG:3857`
 
+For instance: 
 ```js
 reproject: {
-  srs: any coordinate reference systems, e.g. `EPSG:3857`
+  srs: `EPSG:2154`
 }
 ```
 
