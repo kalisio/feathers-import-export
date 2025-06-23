@@ -36,28 +36,35 @@ const options = {
   }
 }
 
+const servicePath = 'features'
+
 const scenarios = [
   {
-    name: 'features',
+    name: 'features-shp',
     dataset: 'features.geojson',
     upload: {
       contentType: 'application/geo+json'
     },
     import: {
       method: 'import',
-      id: 'features.geojson',
-      servicePath: 'features'
+      servicePath,
+      id: 'features.geojson'
     },
     export: {
       method: 'export',
-      servicePath: 'features',
+      servicePath,
       chunkSize: 100,
       transform: {
         omit: ['_id']
       },
       format: 'geojson',
       gzip: false,
-      filename: 'features.shp.zip'
+      filename: 'features.shp.zip',
+      reproject: 'EPSG:3857',
+      convert: {
+        ogrDriver: 'ESRI Shapefile',
+        contentType: 'application/zip'
+      }
     },
     expect: {
       import: {
@@ -65,13 +72,52 @@ const scenarios = [
       },
       export: {
         objects: 255,
-        size: 5323872
+        size: 7393788
+      }
+    }
+  },
+  {
+    name: 'features-kml',
+    dataset: 'features.geojson',
+    upload: {
+      contentType: 'application/geo+json'
+    },
+    import: {
+      method: 'import',
+      servicePath,
+      id: 'features.geojson'
+    },
+    export: {
+      method: 'export',
+      servicePath,
+      chunkSize: 100,
+      transform: {
+        omit: ['_id']
+      },
+      format: 'geojson',
+      gzip: false,
+      filename: 'features.kml',
+      convert: {
+        ogrDriver: 'KML',
+        contentType: 'application/vnd.google-earth.kml+xml'
+      }
+    },
+    expect: {
+      import: {
+        objects: 255
+      },
+      export: {
+        objects: 255,
+        size: 18385506
       }
     }
   }
 ]
 
 function runTests (scenario) {
+  it(`[${scenario.name}] remove mongo service`, async () => {
+    await removeMongoService('features')
+  })
   it(`[${scenario.name}] unzip input dataset`, async () => {
     await unzipDataset(scenario.dataset)
   })
@@ -91,7 +137,7 @@ function runTests (scenario) {
   })
     .timeout(120000)
   it(`[${scenario.name}] check imported collection`, async () => {
-    const service = app.service(scenario.import.servicePath)
+    const service = app.service(servicePath)
     const response = await service.find()
     expect(response.total).to.equal(scenario.expect.import.objects)
   })
@@ -125,6 +171,11 @@ function runTests (scenario) {
     clearDataset(outputId)
     outputId = undefined
   })
+  it(`[${scenario.name}] clean database`, async () => {
+    const service = app.service(servicePath)
+    const response = await service.remove(null)
+    expect(response.length).to.equal(scenario.expect.export.objects)
+  })
 }
 
 describe('feathers-import-export-hooks', () => {
@@ -141,10 +192,8 @@ describe('feathers-import-export-hooks', () => {
 
   it('create the services', async () => {
     // create mongo services
-    for (const scenario of scenarios) {
-      app.use(scenario.name, await createMongoService(scenario.name))
-      expect(app.service(scenario.name)).toExist()
-    }
+    app.use(servicePath, await createMongoService('features'))
+    expect(app.service(servicePath)).toExist()
     // create s3 service
     app.use('path-to-s3', new S3Service(options.s3Options), {
       methods: ['uploadFile', 'downloadFile']
@@ -157,7 +206,10 @@ describe('feathers-import-export-hooks', () => {
     expect(service).toExist()
     service.s3Service.hooks({
       before: {
-        uploadFile: [hooks.geojson2shp]
+        uploadFile: [
+          hooks.reprojectGeoJson,
+          hooks.convertGeoJson
+        ]
       }
     })
     expect(service).toExist()
@@ -169,7 +221,7 @@ describe('feathers-import-export-hooks', () => {
   for (const scenario of scenarios) runTests(scenario)
 
   after(async () => {
-    for (const scenario of scenarios) await removeMongoService(scenario.name)
+    await removeMongoService(servicePath)
     await expressServer.close()
   })
 })
