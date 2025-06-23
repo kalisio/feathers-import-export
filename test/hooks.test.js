@@ -60,7 +60,9 @@ const scenarios = [
       format: 'geojson',
       gzip: false,
       filename: 'features.shp.zip',
-      reproject: 'EPSG:3857',
+      reproject: {
+        srs: 'EPSG:3857'
+      },
       convert: {
         ogrDriver: 'ESRI Shapefile',
         contentType: 'application/zip'

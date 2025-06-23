@@ -276,12 +276,36 @@ service.s3Service.hooks({
 ```
 ### Predefined hooks
 
-#### geojson2shp
+#### convertGeoJson
 
-This hook converts exported **GeoJSON** data to [ESRI Shapefile](https://en.wikipedia.org/wiki/Shapefile) format using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html). The output file is a compressed archive containing `.shp`, `.shx`, `.dbf` and other side-car files of one or several layers.
+This hook converts exported **GeoJSON** data to any format using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html). 
+
+To trigger this hook, you must provide the following options to the `export` method: 
+
+```js
+convert: {
+  ogrDriver: any [Vector driver](https://gdal.org/en/stable/drivers/vector/index.html), e.g. `KML`
+  contentType: file mime type; e.g. `application/vnd.google-earth.kml+xml`
+}
+```
 
 > [!NOTE]
-> To be executed the `filename` option must have the extension `shp.zip`. Otherwise the hook is skipped.
+> In case of [ESRI Shapefile](https://en.wikipedia.org/wiki/Shapefile) format, you must specify a `filename` with the extension `shp.zip` to force the creation of a compressed archive containing `.shp`, `.shx`, `.dbf` and other side-car files of one or more layers.
+
+#### reprojectGeoJson
+
+This hook allows to reproject the exported **GeoJSON** data to any **Coordinate Reference System** using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html). 
+
+To trigger this hook, you must provide the following options to the `export` method: 
+
+```js
+reproject: {
+  srs: any coordinate reference systems, e.g. `EPSG:3857`
+}
+```
+
+> [!NOTE]
+> The coordinate reference systems that can be passed are anything supported by the [OGRSpatialReference::SetFromUserInput()](https://gdal.org/en/stable/api/ogrspatialref.html#_CPPv4N19OGRSpatialReference16SetFromUserInputEPKc) call, which includes EPSG Projected, Geographic or Compound CRS (i.e. EPSG:4296), a well known text (WKT) CRS definition, PROJ.4 declarations, or the name of a .prj file containing a WKT CRS definition.
 
 ## License
 
