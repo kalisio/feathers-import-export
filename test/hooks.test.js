@@ -129,7 +129,7 @@ function runTests (scenario) {
       contentType: scenario.upload.contentType,
       chunkSize: 1024 * 1024 * 10
     })
-    expect(response.id).to.exist
+    expect(response.id).toExist()
     inputId = response.id
   })
     .timeout(300000)
@@ -151,7 +151,7 @@ function runTests (scenario) {
   it(`[${scenario.name}] export collection`, async () => {
     const response = await service.create(scenario.export)
     expect(response.objects).to.equal(scenario.expect.export.objects)
-    expect(response.id).to.exist
+    expect(response.id).toExist()
     outputId = response.id
   })
     .timeout(180000)
@@ -162,7 +162,7 @@ function runTests (scenario) {
   it(`[${scenario.name}] download output files`, async () => {
     const tmpFilePath = getTmpPath(outputId)
     const response = await s3Service.downloadFile({ id: outputId, filePath: tmpFilePath })
-    expect(response.id).to.exist
+    expect(response.id).toExist()
     // check the size of the uncompressed file
     const size = fs.statSync(getTmpPath(outputId)).size
     expect(size).to.be.closeTo(scenario.expect.export.size, 32)
@@ -195,17 +195,17 @@ describe('feathers-import-export:hooks', () => {
   it('create the services', async () => {
     // create mongo services
     app.use(servicePath, await createMongoService('features'))
-    expect(app.service(servicePath)).to.exist
+    expect(app.service(servicePath)).toExist()
     // create s3 service
     app.use('path-to-s3', new S3Service(options.s3Options), {
       methods: ['uploadFile', 'downloadFile']
     })
     s3Service = app.service('path-to-s3')
-    expect(s3Service).to.exist
+    expect(s3Service).toExist()
     // create import-export service
     app.use('import-export', new Service(Object.assign(options, { app })))
     service = app.service('import-export')
-    expect(service).to.exist
+    expect(service).toExist()
     service.s3Service.hooks({
       before: {
         uploadFile: [
@@ -214,7 +214,7 @@ describe('feathers-import-export:hooks', () => {
         ]
       }
     })
-    expect(service).to.exist
+    expect(service).toExist()
     // run the server
     expressServer = await app.listen(3333)
   })

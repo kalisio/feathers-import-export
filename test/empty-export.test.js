@@ -1,5 +1,3 @@
-import _ from 'lodash'
-import fs from 'fs'
 import feathers from '@feathersjs/feathers'
 import express from '@feathersjs/express'
 import { Service as S3Service } from '@kalisio/feathers-s3'
@@ -7,7 +5,7 @@ import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import { Service } from '../lib/index.js'
 import { createMongoService, removeMongoService } from './utils.mongodb.js'
-import { getTmpPath, unzipDataset, clearDataset, unzipFile } from './utils.dataset.js'
+import { getTmpPath, unzipDataset, clearDataset } from './utils.dataset.js'
 import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
@@ -80,7 +78,7 @@ function runTests (scenario) {
       contentType: scenario.upload.contentType,
       chunkSize: 1024 * 1024 * 10
     })
-    expect(response.id).to.exist
+    expect(response.id)
     inputId = response.id
   })
     .timeout(120000)
@@ -102,13 +100,13 @@ function runTests (scenario) {
   it(`[${scenario.name}] export collection`, async () => {
     const response = await service.create(scenario.export)
     expect(response.objects).to.equal(scenario.expect.export.objects)
-    expect(response.id).to.not.exist
+    expect(response.id).beUndefined()
   })
     .timeout(180000)
   it(`[${scenario.name}] export collection without gzip compression`, async () => {
     const response = await service.create(Object.assign(scenario.export, { gzip: false }))
     expect(response.objects).to.equal(scenario.expect.export.objects)
-    expect(response.id).to.not.exist
+    expect(response.id).beUndefined()
   })
     .timeout(180000)
   it(`[${scenario.name}] list output files`, async () => {
@@ -133,18 +131,18 @@ describe('feathers-import-export:empty-export', () => {
     // create mongo services
     for (const scenario of scenarios) {
       app.use(scenario.name, await createMongoService(scenario.name))
-      expect(app.service(scenario.name)).to.exist
+      expect(app.service(scenario.name)).toExist()
     }
     // create s3 service
     app.use('path-to-s3', new S3Service(options.s3Options), {
       methods: ['uploadFile', 'downloadFile']
     })
     s3Service = app.service('path-to-s3')
-    expect(s3Service).to.exist
+    expect(s3Service).toExist()
     // create import-export service
     app.use('import-export', new Service(Object.assign(options, { app })))
     service = app.service('import-export')
-    expect(service).to.exist
+    expect(service).toExist()
     // run the server
     expressServer = await app.listen(3333)
   })
