@@ -161,7 +161,7 @@ function runTests (scenario) {
       contentType: scenario.upload.contentType,
       chunkSize: 1024 * 1024 * 10
     })
-    expect(response.id).toExist()
+    expect(response.id).to.exist
     inputId = response.id
   })
     .timeout(120000)
@@ -183,14 +183,14 @@ function runTests (scenario) {
   it(`[${scenario.name}] export collection`, async () => {
     const response = await service.create(scenario.export)
     expect(response.objects).to.equal(scenario.expect.export.objects)
-    expect(response.id).toExist()
+    expect(response.id).to.exist
     outputIds.push(response.id)
   })
     .timeout(180000)
   it(`[${scenario.name}] export collection without gzip compression`, async () => {
     const response = await service.create(Object.assign(scenario.export, { gzip: false }))
     expect(response.objects).to.equal(scenario.expect.export.objects)
-    expect(response.id).toExist()
+    expect(response.id).to.exist
     outputIds.push(response.id)
   })
     .timeout(180000)
@@ -202,7 +202,7 @@ function runTests (scenario) {
     for (let i = 0; i < 2; i++) {
       const tmpFilePath = getTmpPath(outputIds[i])
       const response = await s3Service.downloadFile({ id: outputIds[i], filePath: tmpFilePath })
-      expect(response.id).toExist()
+      expect(response.id).to.exist
     }
     // check the size of the uncompressed file
     let size = fs.statSync(getTmpPath(outputIds[1])).size
@@ -222,7 +222,7 @@ function runTests (scenario) {
   })
 }
 
-describe('feathers-import-export', () => {
+describe('feathers-import-export:nominal', () => {
   before(() => {
     chailint(chai, util)
     app = express(feathers())
@@ -238,18 +238,18 @@ describe('feathers-import-export', () => {
     // create mongo services
     for (const scenario of scenarios) {
       app.use(scenario.name, await createMongoService(scenario.name))
-      expect(app.service(scenario.name)).toExist()
+      expect(app.service(scenario.name)).to.exist
     }
     // create s3 service
     app.use('path-to-s3', new S3Service(options.s3Options), {
       methods: ['uploadFile', 'downloadFile']
     })
     s3Service = app.service('path-to-s3')
-    expect(s3Service).toExist()
+    expect(s3Service).to.exist
     // create import-export service
     app.use('import-export', new Service(Object.assign(options, { app })))
     service = app.service('import-export')
-    expect(service).toExist()
+    expect(service).to.exist
     // register transformations
     service.registerTransform('csv-import-transform', csvImportTransform)
     service.registerTransform('csv-export-transform', csvExportTransform)
