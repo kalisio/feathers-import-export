@@ -60,10 +60,10 @@ const scenarios = [
       format: 'geojson',
       gzip: false,
       filename: 'features.shp.zip',
-      reproject: {
+      reprojectGeoJson: {
         srs: 'EPSG:3857'
       },
-      convert: {
+      convertGeoJson: {
         ogrDriver: 'ESRI Shapefile',
         contentType: 'application/zip'
       }
@@ -99,7 +99,7 @@ const scenarios = [
       format: 'geojson',
       gzip: false,
       filename: 'features.kml',
-      convert: {
+      convertGeoJson: {
         ogrDriver: 'KML',
         contentType: 'application/vnd.google-earth.kml+xml'
       }
