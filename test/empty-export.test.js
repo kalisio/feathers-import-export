@@ -5,7 +5,7 @@ import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import { Service } from '../lib/index.js'
 import { createMongoService, removeMongoService } from './utils.mongodb.js'
-import { getTmpPath, unzipDataset, clearDataset } from './utils.dataset.js'
+import { getTmpPath, gunzipDataset, clearDataset } from './utils.dataset.js'
 import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
@@ -70,7 +70,7 @@ const scenarios = [
 
 function runTests (scenario) {
   it(`[${scenario.name}] unzip input dataset`, async () => {
-    await unzipDataset(scenario.dataset)
+    await gunzipDataset(scenario.dataset)
   })
   it(`[${scenario.name}] upload input dataset`, async () => {
     const response = await s3Service.uploadFile({
@@ -101,14 +101,23 @@ function runTests (scenario) {
     const response = await service.create(scenario.export)
     expect(response.objects).to.equal(scenario.expect.export.objects)
     expect(response.id).beUndefined()
+    expect(response.filename).beUndefined()
   })
     .timeout(180000)
-  it(`[${scenario.name}] export collection without gzip compression`, async () => {
-    const response = await service.create(Object.assign(scenario.export, { gzip: false }))
+  it(`[${scenario.name}] export collection as zip`, async () => {
+    const response = await service.create(Object.assign(scenario.export, { archive: 'zip' }))
     expect(response.objects).to.equal(scenario.expect.export.objects)
     expect(response.id).beUndefined()
+    expect(response.filename).beUndefined()
   })
     .timeout(180000)
+  it(`[${scenario.name}] export collection as tgz`, async () => {
+    const response = await service.create(Object.assign(scenario.export, { archive: 'tgz' }))
+    expect(response.objects).to.equal(scenario.expect.export.objects)
+    expect(response.id).beUndefined()
+    expect(response.filename).beUndefined()
+  })
+    .timeout(180000)    
   it(`[${scenario.name}] list output files`, async () => {
     const response = await s3Service.find()
     expect(response.length).to.equal(0)

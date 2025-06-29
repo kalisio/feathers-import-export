@@ -7,7 +7,7 @@ import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import { Service, hooks } from '../lib/index.js'
 import { createMongoService, removeMongoService } from './utils.mongodb.js'
-import { getTmpPath, unzipDataset, clearDataset } from './utils.dataset.js'
+import { getTmpPath, gunzipDataset, clearDataset } from './utils.dataset.js'
 import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
@@ -58,7 +58,6 @@ const scenarios = [
         omit: ['_id']
       },
       format: 'geojson',
-      gzip: false,
       filename: 'features.shp.zip',
       reprojectGeoJson: {
         srs: 'EPSG:3857'
@@ -97,7 +96,6 @@ const scenarios = [
         omit: ['_id']
       },
       format: 'geojson',
-      gzip: false,
       filename: 'features.kml',
       convertGeoJson: {
         ogrDriver: 'KML',
@@ -121,7 +119,7 @@ function runTests (scenario) {
     await removeMongoService('features')
   })
   it(`[${scenario.name}] unzip input dataset`, async () => {
-    await unzipDataset(scenario.dataset)
+    await gunzipDataset(scenario.dataset)
   })
   it(`[${scenario.name}] upload input dataset`, async () => {
     const response = await s3Service.uploadFile({
@@ -151,15 +149,16 @@ function runTests (scenario) {
   it(`[${scenario.name}] export collection`, async () => {
     const response = await service.create(scenario.export)
     expect(response.objects).to.equal(scenario.expect.export.objects)
+    expect(response.filename).to.equal(scenario.export.filename)
     expect(response.id).toExist()
     outputId = response.id
   })
     .timeout(180000)
-  it(`[${scenario.name}] list output files`, async () => {
+  it(`[${scenario.name}] list output file`, async () => {
     const response = await s3Service.find()
     expect(response.length).to.equal(1)
   })
-  it(`[${scenario.name}] download output files`, async () => {
+  it(`[${scenario.name}] download output file`, async () => {
     const tmpFilePath = getTmpPath(outputId)
     const response = await s3Service.downloadFile({ id: outputId, filePath: tmpFilePath })
     expect(response.id).toExist()

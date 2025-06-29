@@ -155,7 +155,7 @@ The payload `data` must contain the following properties:
 
 ### export (data, params)
 
-Exports the result of a query into a **JSON**, **CSV** or **GeoJson** file that it stored on an **S3** compatible storage. The file can be compressed using [GZip](https://www.gzip.org/).
+Exports the result of a query into a **JSON**, **CSV** or **GeoJson** file that it stored on an **S3** compatible storage. The file can be archived in [zip]() or [tgz] using [Archiver](https://www.archiverjs.com/).
 By default It returns a **Presigned URL** to the file.
 
 The payload `data` must contain the following properties:
@@ -168,7 +168,7 @@ The payload `data` must contain the following properties:
 | `chunkSize` | the number of objects to be processed by chunk. Default value is `500` | no |
 | `transform`| the [transformation](./#transformation) to apply before exporting the data. Default is `undefined` | no |
 | `format` | the output format. Défaut value is `json` | no |
-| `zip`| whether to zip the output or not. Default value is `true` | no |
+| `archive`| whether to archive the output or not. It should be `zip`, `tgz` or `undefined`. Default value is `undefined` | no |
 | `signedUrl` | whether to return a signed url. Default value is `true` | no |
 | `expiresIn` | the expiration delay of the returned signed url. Default value is `300` | no |
 

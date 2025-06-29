@@ -7,7 +7,8 @@ import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import { Service } from '../lib/index.js'
 import { createMongoService, removeMongoService } from './utils.mongodb.js'
-import { getTmpPath, unzipDataset, clearDataset, unzipFile } from './utils.dataset.js'
+import { getTmpPath, gunzipDataset, clearDataset } from './utils.dataset.js'
+import { unzipFile, untarFile } from './utils.archive.js'
 import makeDebug from 'debug'
 
 feathers.setDebug(makeDebug)
@@ -18,6 +19,7 @@ let service
 let expressServer
 let inputId
 let outputIds = []
+let outputFilenames = []
 
 function csvImportTransform (chunk) {
   _.forEach(chunk, object => {
@@ -152,8 +154,8 @@ const scenarios = [
 ]
 
 function runTests (scenario) {
-  it(`[${scenario.name}] unzip input dataset`, async () => {
-    await unzipDataset(scenario.dataset)
+  it(`[${scenario.name}] gunzip input dataset`, async () => {
+    await gunzipDataset(scenario.dataset)
   })
   it(`[${scenario.name}] upload input dataset`, async () => {
     const response = await s3Service.uploadFile({
@@ -185,40 +187,62 @@ function runTests (scenario) {
     expect(response.objects).to.equal(scenario.expect.export.objects)
     expect(response.id).toExist()
     outputIds.push(response.id)
+    outputFilenames.push(response.filename)
+    expect(outputIds.length).to.equal(1)
   })
     .timeout(180000)
-  it(`[${scenario.name}] export collection without gzip compression`, async () => {
-    const response = await service.create(Object.assign(scenario.export, { gzip: false }))
+  it(`[${scenario.name}] export collection as zip`, async () => {
+    const response = await service.create(Object.assign(scenario.export, { archive: 'zip' }))
     expect(response.objects).to.equal(scenario.expect.export.objects)
     expect(response.id).toExist()
     outputIds.push(response.id)
+    outputFilenames.push(response.filename)
+    expect(outputIds.length).to.equal(2)
   })
     .timeout(180000)
+  it(`[${scenario.name}] export collection as tgz`, async () => {
+    const response = await service.create(Object.assign(scenario.export, { archive: 'tgz' }))
+    expect(response.objects).to.equal(scenario.expect.export.objects)
+    expect(response.id).toExist()
+    outputIds.push(response.id)
+    outputFilenames.push(response.filename)
+    expect(outputIds.length).to.equal(3)
+  })
+    .timeout(180000)  
   it(`[${scenario.name}] list output files`, async () => {
     const response = await s3Service.find()
     expect(response.length).to.equal(outputIds.length)
   })
   it(`[${scenario.name}] download output files`, async () => {
-    for (let i = 0; i < 2; i++) {
-      const tmpFilePath = getTmpPath(outputIds[i])
-      const response = await s3Service.downloadFile({ id: outputIds[i], filePath: tmpFilePath })
+    for (const outputId of outputIds) {
+      const tmpFilePath = getTmpPath(outputId)
+      const response = await s3Service.downloadFile({ id: outputId, filePath: tmpFilePath })
       expect(response.id).toExist()
     }
     // check the size of the uncompressed file
-    let size = fs.statSync(getTmpPath(outputIds[1])).size
+    let size = fs.statSync(getTmpPath(outputIds[0])).size
     expect(size).to.equal(scenario.expect.export.size)
-    // unzip the compressed file (replace the uncompressed file) to check the size
-    await unzipFile(getTmpPath(outputIds[0]), getTmpPath(outputIds[1]))
-    size = fs.statSync(getTmpPath(outputIds[1])).size
+    // zip file
+    const unzipFilename = _.replace(outputFilenames[1], '.zip', '')
+    await unzipFile(getTmpPath(outputIds[1]))
+    size = fs.statSync(getTmpPath(unzipFilename)).size
     expect(size).to.equal(scenario.expect.export.size)
+    fs.unlinkSync(getTmpPath(unzipFilename))
+    // tgz file
+    const untarFilename = _.replace(outputFilenames[2], '.tgz', '')
+    await untarFile(getTmpPath(outputIds[2]))
+    size = fs.statSync(getTmpPath(untarFilename)).size
+    expect(size).to.equal(scenario.expect.export.size)
+    fs.unlinkSync(getTmpPath(untarFilename))
   })
   it(`[${scenario.name}] clean output files`, async () => {
-    for (let i = 0; i < 2; i++) {
-      const response = await s3Service.remove(outputIds[i])
+    for (const outputId of outputIds) {
+      const response = await s3Service.remove(outputId)
       expect(response.$metadata.httpStatusCode).to.equal(204)
-      clearDataset(outputIds[i])
+      clearDataset(outputId)
     }
     outputIds = []
+    outputFilenames = []
   })
 }
 
