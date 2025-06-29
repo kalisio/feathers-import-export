@@ -21,6 +21,3 @@ export async function gunzipDataset (dataset) {
 export function clearDataset (dataset) {
   fs.unlinkSync(getTmpPath(dataset))
 }
-
-
-

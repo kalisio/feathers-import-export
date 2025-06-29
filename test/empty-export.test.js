@@ -117,7 +117,7 @@ function runTests (scenario) {
     expect(response.id).beUndefined()
     expect(response.filename).beUndefined()
   })
-    .timeout(180000)    
+    .timeout(180000)
   it(`[${scenario.name}] list output files`, async () => {
     const response = await s3Service.find()
     expect(response.length).to.equal(0)

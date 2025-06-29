@@ -18,7 +18,7 @@ export async function unzipFile (inputFilePath) {
   await new Promise((resolve, reject) => {
     fs.createReadStream(inputFilePath)
       .pipe(unzipper.Extract({ path: path.dirname(inputFilePath) }))
-      .on('close', resolve)   
+      .on('close', resolve)
       .on('error', reject)
   })
 }

@@ -208,7 +208,7 @@ function runTests (scenario) {
     outputFilenames.push(response.filename)
     expect(outputIds.length).to.equal(3)
   })
-    .timeout(180000)  
+    .timeout(180000)
   it(`[${scenario.name}] list output files`, async () => {
     const response = await s3Service.find()
     expect(response.length).to.equal(outputIds.length)

@@ -155,7 +155,7 @@ The payload `data` must contain the following properties:
 
 ### export (data, params)
 
-Exports the result of a query into a **JSON**, **CSV** or **GeoJson** file that it stored on an **S3** compatible storage. The file can be archived in [zip]() or [tgz] using [Archiver](https://www.archiverjs.com/).
+Exports the result of a query into a **JSON**, **CSV** or **GeoJson** file that it stored on an **S3** compatible storage. The file can be archived in [zip](https://en.wikipedia.org/wiki/ZIP_(file_format)) or [tgz](https://en.wikipedia.org/wiki/Gzip) using [Archiver](https://www.archiverjs.com/).
 By default It returns a **Presigned URL** to the file.
 
 The payload `data` must contain the following properties:
@@ -296,6 +296,9 @@ convertGeoJson: {
 > [!NOTE]
 > In case of [ESRI Shapefile](https://en.wikipedia.org/wiki/Shapefile) format, you must specify a `filename` with the extension `shp.zip` to force the creation of a compressed archive containing `.shp`, `.shx`, `.dbf` and other side-car files of one or more layers.
 
+> [!WARNING]
+> This hook cannot be applied to archived data.
+
 #### reprojectGeoJson
 
 This hook allows to reproject the exported **GeoJSON** data to any **Coordinate Reference System** using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html). 
@@ -312,6 +315,9 @@ reprojectGeoJson: {
 
 > [!NOTE]
 > The coordinate reference systems that can be passed are anything supported by the [OGRSpatialReference::SetFromUserInput()](https://gdal.org/en/stable/api/ogrspatialref.html#_CPPv4N19OGRSpatialReference16SetFromUserInputEPKc) call, which includes EPSG Projected, Geographic or Compound CRS (i.e. EPSG:4296), a well known text (WKT) CRS definition, PROJ.4 declarations, or the name of a .prj file containing a WKT CRS definition.
+
+> [!WARNING]
+> This hook cannot be applied to archived data.
 
 ## License
 
