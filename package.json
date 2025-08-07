@@ -57,7 +57,7 @@
     "lodash": "^4.17.21",
     "mathjs": "^11.11.2",
     "moment": "^2.29.4",
-    "papaparse": "^5.4.1",
+    "papaparse": "^5.5.3",
     "sift": "^17.0.1"
   },
   "devDependencies": {
