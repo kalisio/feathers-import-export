@@ -39,6 +39,42 @@ const options = {
 const servicePath = 'features'
 
 const scenarios = [
+  // reproject the dataset
+  {
+    name: 'features-geojson',
+    dataset: 'features.geojson',
+    upload: {
+      contentType: 'application/geo+json'
+    },
+    import: {
+      method: 'import',
+      servicePath,
+      id: 'features.geojson'
+    },
+    export: {
+      method: 'export',
+      servicePath,
+      chunkSize: 100,
+      transform: {
+        omit: ['_id']
+      },
+      format: 'geojson',
+      filename: 'features.geojson',
+      reprojectGeoJson: {
+        srs: 'EPSG:3857'
+      }
+    },
+    expect: {
+      import: {
+        objects: 255
+      },
+      export: {
+        objects: 255,
+        size: 30128000
+      }
+    }
+  },
+  // reproject and convert the dataset to SHP
   {
     name: 'features-shp',
     dataset: 'features.geojson',
@@ -77,6 +113,7 @@ const scenarios = [
       }
     }
   },
+  // convert the dataset to KML
   {
     name: 'features-kml',
     dataset: 'features.geojson',
@@ -169,7 +206,7 @@ function runTests (scenario) {
   it(`[${scenario.name}] clean output files`, async () => {
     const response = await s3Service.remove(outputId)
     expect(response.$metadata.httpStatusCode).to.equal(204)
-    clearDataset(outputId)
+    //clearDataset(outputId)
     outputId = undefined
   })
   it(`[${scenario.name}] clean database`, async () => {
