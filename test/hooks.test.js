@@ -73,7 +73,7 @@ const scenarios = [
       },
       export: {
         objects: 255,
-        size: 7393820
+        size: 7393565
       }
     }
   },
