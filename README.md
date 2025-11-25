@@ -118,6 +118,7 @@ Create an instance of the service with the given options:
 |---|---|---|
 |`s3Options` | the options to configure the S3 service. Refer to [feathers-s3](https://github.com/kalisio/feathers-s3#constructor-options) API. | yes |
 | `app` | the feathers app. | yes |
+| `allowedServicePaths` | the allowed path to the services. | yes |
 | `workingDir` | the working directory to process temporary files. Default value is `/tmp`. | no |
 
 ### registerTransform (key, transform)
@@ -150,7 +151,7 @@ The payload `data` must contain the following properties:
 | Argument | Description | Required |
 |---|---|---|
 | `id` | the object key. Note that the final computed **key** takes into account the `prefix` option of the service. | yes |
-| `servicePath` | the path to the service into which to import the data. | yes |
+| `servicePath` | the service path into which the data should be imported. | yes |
 | `transform`| the [transformation](./#transformation) to apply before importing the data. Default is `undefined` | no |
 
 ### export (data, params)
@@ -162,7 +163,7 @@ The payload `data` must contain the following properties:
 
 | Argument | Description | Required 
 |---|---|---|
-| `servicePath` | the path to the service to be queried.| yes |
+| `servicePath` | the service path to be queried..| yes |
 | `query` | the query to apply. Default value is `{}` | no |
 | `chunkPath`| the path to the data when processing the query response. Default value is `data` | no |
 | `chunkSize` | the number of objects to be processed by chunk. Default value is `500` | no |
