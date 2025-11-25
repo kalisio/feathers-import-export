@@ -62,7 +62,7 @@ describe('feathers-import-export:exception', () => {
     expressServer = await app.listen(3333)
   })
 
-  it('Should fail to import with a non allowed service path', async () => {
+  it('fail to import with a non allowed service path', async () => {
     try {
       await service.create({
         method: 'import',
@@ -76,7 +76,7 @@ describe('feathers-import-export:exception', () => {
     }
   })
 
-  it('Should fail to export with a non allowed service path', async () => {
+  it('fail to export with a non allowed service path', async () => {
     try {
       await service.create({
         method: 'export',

@@ -207,7 +207,7 @@ function runTests (scenario) {
   it(`[${scenario.name}] clean output files`, async () => {
     const response = await s3Service.remove(outputId)
     expect(response.$metadata.httpStatusCode).to.equal(204)
-    // clearDataset(outputId)
+    clearDataset(outputId)
     outputId = undefined
   })
   it(`[${scenario.name}] clean database`, async () => {
