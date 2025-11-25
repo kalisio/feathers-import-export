@@ -39,7 +39,6 @@ function csvExportTransform (chunk) {
 }
 
 const options = {
-  workingDir: './test/tmp',
   s3Options: {
     s3Client: {
       credentials: {
@@ -52,7 +51,9 @@ const options = {
     },
     bucket: process.env.S3_BUCKET,
     prefix: Date.now().toString()
-  }
+  },
+  allowedServicePaths: ['objects', 'features', 'records'],
+  workingDir: './test/tmp'
 }
 
 const scenarios = [
@@ -247,6 +248,7 @@ function runTests (scenario) {
 }
 
 describe('feathers-import-export:nominal', () => {
+
   before(() => {
     chailint(chai, util)
     app = express(feathers())

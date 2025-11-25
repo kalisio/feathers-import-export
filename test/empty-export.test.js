@@ -17,7 +17,6 @@ let expressServer
 let inputId
 
 const options = {
-  workingDir: './test/tmp',
   s3Options: {
     s3Client: {
       credentials: {
@@ -30,7 +29,9 @@ const options = {
     },
     bucket: process.env.S3_BUCKET,
     prefix: Date.now().toString()
-  }
+  },
+  allowedServicePaths: '^o[a-z]{5}s$',
+  workingDir: './test/tmp'
 }
 
 const scenarios = [

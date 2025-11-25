@@ -20,7 +20,6 @@ let inputId
 let outputId
 
 const options = {
-  workingDir: './test/tmp',
   s3Options: {
     s3Client: {
       credentials: {
@@ -33,7 +32,9 @@ const options = {
     },
     bucket: process.env.S3_BUCKET,
     prefix: crypto.randomUUID()
-  }
+  },
+  allowedServicePaths: 'features',
+  workingDir: './test/tmp'
 }
 
 const servicePath = 'features'
@@ -217,6 +218,7 @@ function runTests (scenario) {
 }
 
 describe('feathers-import-export:hooks', () => {
+
   before(() => {
     chailint(chai, util)
     app = express(feathers())
