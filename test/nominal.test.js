@@ -248,7 +248,6 @@ function runTests (scenario) {
 }
 
 describe('feathers-import-export:nominal', () => {
-
   before(() => {
     chailint(chai, util)
     app = express(feathers())

@@ -33,7 +33,6 @@ const options = {
 }
 
 describe('feathers-import-export:exception', () => {
-
   before(() => {
     chailint(chai, util)
     app = express(feathers())
@@ -48,17 +47,17 @@ describe('feathers-import-export:exception', () => {
   it('create the services', async () => {
     // create mongo services
     app.use('objects', await createMongoService('objects'))
-    expect(app.service('objects')).to.exist
+    expect(app.service('objects')).toExist()
     // create s3 service
     app.use('path-to-s3', new S3Service(options.s3Options), {
       methods: ['uploadFile', 'downloadFile']
     })
     s3Service = app.service('path-to-s3')
-    expect(s3Service).to.exist
+    expect(s3Service).toExist()
     // create import-export service
     app.use('import-export', new Service(Object.assign(options, { app })))
     service = app.service('import-export')
-    expect(service).to.exist
+    expect(service).toExist()
     // run the server
     expressServer = await app.listen(3333)
   })
@@ -72,7 +71,7 @@ describe('feathers-import-export:exception', () => {
       })
     } catch (error) {
       // ensure the error was raised
-      expect(error).to.exist
+      expect(error).toExist()
       expect(error.message).is.equal('import: service path \'users\' is not allowed')
     }
   })
@@ -86,10 +85,9 @@ describe('feathers-import-export:exception', () => {
       })
     } catch (error) {
       // ensure the error was raised
-      expect(error).to.exist
+      expect(error).toExist()
       expect(error.message).is.equal('export: service path \'users\' is not allowed')
     }
-
   })
 
   after(async () => {
