@@ -9,7 +9,7 @@
 
 > `feathers-import-export` provides convenient methods to import/export to/from [Feathers services](https://feathersjs.com/api/services.html).
 
-`feathers-import-export` has been specially designed to process large volumes of data and to overcome data transfer problems during import and export, it relies on the capabilities of the S3 API. 
+`feathers-import-export` has been specially designed to process large volumes of data and to overcome data transfer problems during import and export, it relies on the capabilities of the S3 API.
 
 > [!WARNING]
 > Consequently, the use of this library requires being able to operate a store compatible with the **S3 API**.
@@ -67,6 +67,7 @@ const options = {
       signatureVersion: 'v4'
     },
     bucket: process.env.S3_BUCKET,
+    allowedServicePaths: 'path/to/my/service' // a regular expression, or an array, used to validate the path to the requested service
     prefix: 'tmp' // a folder used to store imported/exporter files
   },
   app,
@@ -118,7 +119,7 @@ Create an instance of the service with the given options:
 |---|---|---|
 |`s3Options` | the options to configure the S3 service. Refer to [feathers-s3](https://github.com/kalisio/feathers-s3#constructor-options) API. | yes |
 | `app` | the feathers app. | yes |
-| `allowedServicePaths` | the allowed path to the services. | yes |
+| `allowedServicePaths` | the allowed path to the services. It must be a regular expression or an array of regular expressions. | yes |
 | `workingDir` | the working directory to process temporary files. Default value is `/tmp`. | no |
 
 ### registerTransform (key, transform)
@@ -161,7 +162,7 @@ By default It returns a **Presigned URL** to the file.
 
 The payload `data` must contain the following properties:
 
-| Argument | Description | Required 
+| Argument | Description | Required
 |---|---|---|
 | `servicePath` | the service path to be queried..| yes |
 | `query` | the query to apply. Default value is `{}` | no |
@@ -238,7 +239,7 @@ transform: {
 
 The transformation function must be [registered](#registertransform-key-transform) in the service.
 
-The function must have the following signature: `function myTransform (chunk, options)` where 
+The function must have the following signature: `function myTransform (chunk, options)` where
 * `chunk` represents an array of JSON objects.
 * `options` represents the options passed to the `import` or `export` methods. It allows you to retrieve some contextual data if needed when processing the chunk.
 
@@ -279,13 +280,13 @@ service.s3Service.hooks({
 
 #### convertGeoJson
 
-This hook converts exported **GeoJSON** data to any format using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html). 
+This hook converts exported **GeoJSON** data to any format using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html).
 
 To trigger this hook,you must declare the `convertGeoJson` object in the `export` method with the following properties:
 * `ogrDriver`: any [Vector driver](https://gdal.org/en/stable/drivers/vector/index.html), e.g. `KML`,
 * `contentType`: file mime type; e.g. `application/vnd.google-earth.kml+xml`
 
-For instance: 
+For instance:
 
 ```js
 convertGeoJson: {
@@ -302,12 +303,12 @@ convertGeoJson: {
 
 #### reprojectGeoJson
 
-This hook allows to reproject the exported **GeoJSON** data to any **Coordinate Reference System** using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html). 
+This hook allows to reproject the exported **GeoJSON** data to any **Coordinate Reference System** using [ogr2ogr](https://gdal.org/programs/ogr2ogr.html).
 
 To trigger this hook, you must declare the `reprojectGeoJson` object in the `export` method with the following properties:
 * `srs`: any coordinate reference systems, e.g. `EPSG:3857`
 
-For instance: 
+For instance:
 ```js
 reprojectGeoJson: {
   srs: `EPSG:2154`
@@ -328,6 +329,6 @@ Licensed under the [MIT license](LICENSE).
 
 ## Authors
 
-This project is sponsored by 
+This project is sponsored by
 
 [![Kalisio](https://s3.eu-central-1.amazonaws.com/kalisioscope/kalisio/kalisio-logo-black-256x84.png)](https://kalisio.com)
