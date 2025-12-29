@@ -2,6 +2,7 @@
 
 [![Latest Release](https://img.shields.io/github/v/tag/kalisio/feathers-import-export?sort=semver&label=latest)](https://github.com/kalisio/feathers-import-export/releases)
 [![ci](https://github.com/kalisio/feathers-import-export/actions/workflows/main.yaml/badge.svg)](https://github.com/kalisio/feathers-import-export/actions/workflows/main.yaml)
+[![Quality Gate Status](https://sonar.portal.kalisio.com/api/project_badges/measure?project=kalisio-feathers-import-export&metric=alert_status&token=sqb_2f50e4881828bd4be4cbfadae74c1ca49ca7e96e)](https://sonar.portal.kalisio.com/dashboard?id=kalisio-feathers-import-export)
 [![Maintainability Issues](https://sonar.portal.kalisio.com/api/project_badges/measure?project=kalisio-feathers-import-export&metric=software_quality_maintainability_issues&token=sqb_2f50e4881828bd4be4cbfadae74c1ca49ca7e96e)](https://sonar.portal.kalisio.com/dashboard?id=kalisio-feathers-import-export)
 [![Coverage](https://sonar.portal.kalisio.com/api/project_badges/measure?project=kalisio-feathers-import-export&metric=coverage&token=sqb_2f50e4881828bd4be4cbfadae74c1ca49ca7e96e)](https://sonar.portal.kalisio.com/dashboard?id=kalisio-feathers-import-export)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
