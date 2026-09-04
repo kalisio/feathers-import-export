@@ -10,6 +10,17 @@
 
 > `feathers-import-export` provides convenient methods to import/export to/from [Feathers services](https://feathersjs.com/api/services.html).
 
+
+> [!IMPORTANT]
+> This package has moved to the [`feathers-ekosystem`](https://github.com/kalisio/feathers-ekosystem) monorepo.
+>
+> Please use and follow the version maintained in `packages/feathers-s3` from now on.
+>
+> This repository is no longer maintained.
+
+
+<details> <summary>Legacy documentation</summary>
+
 `feathers-import-export` has been specially designed to process large volumes of data and to overcome data transfer problems during import and export, it relies on the capabilities of the S3 API.
 
 > [!WARNING]
@@ -322,10 +333,20 @@ reprojectGeoJson: {
 > [!WARNING]
 > This hook cannot be applied to archived data.
 
+</details>
+
 ## License
 
 Licensed under the [MIT license](LICENSE).
 
-Copyright (c) 2017-20xx [Kalisio](https://kalisio.com)
+Copyright (c) 2017-present [Kalisio](https://kalisio.com)
 
 [![Kalisio](https://kalisio.github.io/kalisioscope/kalisio/kalisio-logo-black-256x84.png)](https://kalisio.com)
+
+<a href="https://kalisio.com">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://kalisio.github.io/kalisioscope/kalisio/kalisio-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://kalisio.github.io/kalisioscope/kalisio/kalisio-logo-light.svg">
+    <img alt="Kalisio" src="https://kalisio.github.io/kalisioscope/kalisio/kalisio-logo-light.svg" height="96">
+  </picture>
+</a>
