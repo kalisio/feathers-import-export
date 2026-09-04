@@ -1,7 +1,6 @@
 # feathers-import-export
 
 [![Latest Release](https://img.shields.io/github/v/tag/kalisio/feathers-import-export?sort=semver&label=latest)](https://github.com/kalisio/feathers-import-export/releases)
-[![ci](https://github.com/kalisio/feathers-import-export/actions/workflows/main.yaml/badge.svg)](https://github.com/kalisio/feathers-import-export/actions/workflows/main.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Download Status](https://img.shields.io/npm/dm/@kalisio/feathers-import-export.svg?style=flat-square)](https://www.npmjs.com/package/@kalisio/feathers-import-export)
 
@@ -11,7 +10,7 @@
 > [!IMPORTANT]
 > This package has moved to the [`feathers-ekosystem`](https://github.com/kalisio/feathers-ekosystem) monorepo.
 >
-> Please use and follow the version maintained in `packages/feathers-s3` from now on.
+> Please use and follow the version maintained in `packages/feathers-import-export` from now on.
 >
 > This repository is no longer maintained.
 
